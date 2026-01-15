@@ -856,17 +856,21 @@
                     <button class="tab-btn" onclick="setStudentType('existing')">舊生</button>
                 </div>
                 <div id="newStudentForm">
-                    <div class="form-group"><label class="form-label">姓名 *</label><input type="text" class="form-input" id="memberName" placeholder="請輸入會員姓名"></div>
-                    <div class="form-group"><label class="form-label">電話 *</label><input type="tel" class="form-input" id="memberPhone" placeholder="請輸入聯絡電話"></div>
-                    <div class="form-group"><label class="form-label">檢測日期</label><input type="date" class="form-input" id="assessmentDate"></div>
+                    <div class="search-row">
+                        <div class="form-group"><label class="form-label">姓名 *</label><input type="text" class="form-input" id="memberName" placeholder="請輸入會員姓名"></div>
+                        <div class="form-group"><label class="form-label">電話 *</label><input type="tel" class="form-input" id="memberPhone" placeholder="請輸入聯絡電話"></div>
+                        <button class="btn btn-search" onclick="searchMember('new')">🔍 查詢</button>
+                    </div>
+                    <div id="newMemberSearchResult"></div>
+                    <div class="form-group" style="margin-top: 15px;"><label class="form-label">檢測日期</label><input type="date" class="form-input" id="assessmentDate"></div>
                 </div>
                 <div id="existingStudentForm" style="display: none;">
                     <div class="search-row">
                         <div class="form-group"><label class="form-label">姓名 *</label><input type="text" class="form-input" id="searchName" placeholder="請輸入姓名"></div>
                         <div class="form-group"><label class="form-label">電話 *</label><input type="tel" class="form-input" id="searchPhone" placeholder="請輸入電話"></div>
-                        <button class="btn btn-search" onclick="searchMember()">🔍 查詢</button>
+                        <button class="btn btn-search" onclick="searchMember('existing')">🔍 查詢</button>
                     </div>
-                    <div id="memberSearchResult"></div>
+                    <div id="existingMemberSearchResult"></div>
                     <div class="form-group" style="margin-top: 15px;">
                         <label class="form-label">檢測日期</label>
                         <input type="date" class="form-input" id="existingAssessmentDate">
@@ -1489,9 +1493,19 @@
         });
 
         // ==================== 會員查詢 ====================
-        async function searchMember() {
-            var name = document.getElementById('searchName').value.trim();
-            var phone = document.getElementById('searchPhone').value.trim();
+        async function searchMember(type) {
+            // 根據類型取得輸入值
+            var name, phone, resultContainerId;
+            
+            if (type === 'new') {
+                name = document.getElementById('memberName').value.trim();
+                phone = document.getElementById('memberPhone').value.trim();
+                resultContainerId = 'newMemberSearchResult';
+            } else {
+                name = document.getElementById('searchName').value.trim();
+                phone = document.getElementById('searchPhone').value.trim();
+                resultContainerId = 'existingMemberSearchResult';
+            }
             
             if (!name || !phone) {
                 showToast('請輸入姓名和電話');
@@ -1516,25 +1530,26 @@
                 
                 if (result.success && result.member) {
                     memberData = result.member;
-                    showMemberResult(result.member, result.history || []);
+                    showMemberResult(result.member, result.history || [], type, resultContainerId);
                 } else {
-                    showMemberError('查無此會員，請確認姓名和電話是否正確');
+                    showMemberError('查無此會員，請確認姓名和電話是否正確', resultContainerId);
                 }
             } catch (error) {
                 hideLoading();
-                showMemberError('查詢失敗，請稍後再試');
+                showMemberError('查詢失敗，請稍後再試', resultContainerId);
                 console.error('Search error:', error);
             }
         }
 
-        function showMemberResult(member, history) {
+        function showMemberResult(member, history, type, containerId) {
             var html = '<div class="member-result">' +
                 '<div class="member-result-title">✅ 查詢成功</div>' +
                 '<div class="member-result-row"><span class="member-result-label">學生編號</span><span class="member-result-value">' + member.id + '</span></div>' +
                 '<div class="member-result-row"><span class="member-result-label">姓名</span><span class="member-result-value">' + member.name + '</span></div>' +
                 '<div class="member-result-row"><span class="member-result-label">電話</span><span class="member-result-value">' + member.phone + '</span></div>';
             
-            if (history.length > 0) {
+            // 只有舊生才顯示歷史檢測紀錄
+            if (type === 'existing' && history.length > 0) {
                 html += '<div style="margin-top: 15px;"><label class="form-label">歷史檢測紀錄</label>' +
                     '<select class="form-input" id="historySelect" onchange="loadHistory(this.value)">' +
                     '<option value="">建立新檢測</option>';
@@ -1545,11 +1560,11 @@
             }
             
             html += '</div>';
-            document.getElementById('memberSearchResult').innerHTML = html;
+            document.getElementById(containerId).innerHTML = html;
         }
 
-        function showMemberError(msg) {
-            document.getElementById('memberSearchResult').innerHTML = '<div class="search-error">' + msg + '</div>';
+        function showMemberError(msg, containerId) {
+            document.getElementById(containerId).innerHTML = '<div class="search-error">' + msg + '</div>';
             memberData = null;
         }
 
@@ -1763,13 +1778,25 @@
 
         // ==================== 表單收集與提交 ====================
         function collectFormData() {
+            // 根據類型取得姓名和電話
+            var inputName, inputPhone, inputDate;
+            if (studentType === 'new') {
+                inputName = document.getElementById('memberName').value;
+                inputPhone = document.getElementById('memberPhone').value;
+                inputDate = document.getElementById('assessmentDate').value;
+            } else {
+                inputName = document.getElementById('searchName').value;
+                inputPhone = document.getElementById('searchPhone').value;
+                inputDate = document.getElementById('existingAssessmentDate').value;
+            }
+            
             var data = {
-                // 會員資料
+                // 會員資料（優先使用查詢結果）
                 studentType: studentType,
                 memberId: memberData ? memberData.id : '',
-                memberName: studentType === 'new' ? document.getElementById('memberName').value : (memberData ? memberData.name : ''),
-                memberPhone: studentType === 'new' ? document.getElementById('memberPhone').value : (memberData ? memberData.phone : ''),
-                assessmentDate: studentType === 'new' ? document.getElementById('assessmentDate').value : document.getElementById('existingAssessmentDate').value,
+                memberName: memberData ? memberData.name : inputName,
+                memberPhone: memberData ? memberData.phone : inputPhone,
+                assessmentDate: inputDate,
                 
                 // 個人資料
                 goals: Array.from(document.querySelectorAll('input[name="goals"]:checked')).map(function(el) { return el.value; }),
@@ -1928,12 +1955,18 @@
                 return;
             }
             
+            // 驗證是否已查詢取得學生編號
+            if (!formData.memberId) {
+                showToast('請先點擊「查詢」取得學生編號');
+                return;
+            }
+            
             showLoading('正在提交...');
             document.getElementById('submitBtn').disabled = true;
             
             try {
                 // 上傳圖片
-                var memberId = formData.memberId || 'NEW_' + Date.now();
+                var memberId = formData.memberId;
                 var imageData = await uploadAllImages(memberId, formData.memberName, formData.assessmentDate);
                 
                 // 整合資料
@@ -2014,7 +2047,8 @@
             document.getElementById('newStudentForm').style.display = t === 'new' ? 'block' : 'none';
             document.getElementById('existingStudentForm').style.display = t === 'existing' ? 'block' : 'none';
             memberData = null;
-            document.getElementById('memberSearchResult').innerHTML = '';
+            document.getElementById('newMemberSearchResult').innerHTML = '';
+            document.getElementById('existingMemberSearchResult').innerHTML = '';
         }
 
         function toggleExerciseDetails() {
