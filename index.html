@@ -346,6 +346,23 @@
             box-shadow: 0 0 0 3px rgba(159, 204, 204, 0.2);
         }
         .step-note-input::placeholder { color: #aaa; }
+        
+        .item-note-input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            margin-top: 6px;
+            background: rgba(255,255,255,0.8);
+        }
+        .item-note-input:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: white;
+        }
+        .item-note-input::placeholder { color: #bbb; font-size: 13px; }
 
         .muscle-entry {
             background: white;
@@ -718,6 +735,8 @@
         .timeline-detail {
             margin-top: 15px;
             min-height: 120px;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .timeline-detail-hint {
             text-align: center;
@@ -798,6 +817,22 @@
         .no-data {
             color: #999;
             font-size: 0.85rem;
+        }
+        .note-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .note-item {
+            background: var(--blue-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        .note-title {
+            font-weight: 600;
+            color: var(--blue-dark);
         }
         
         .search-row {
@@ -1164,7 +1199,6 @@
                             <div class="form-group"><label class="form-label">第一風險</label><input type="text" class="form-input" id="risk1" placeholder="請輸入第一風險"></div>
                             <div class="form-group"><label class="form-label">第二風險</label><input type="text" class="form-input" id="risk2" placeholder="請輸入第二風險"></div>
                             <div class="form-group"><label class="form-label">第三風險</label><input type="text" class="form-input" id="risk3" placeholder="請輸入第三風險"></div>
-                            <textarea class="step-note-input" id="step0Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="1">
@@ -1175,6 +1209,7 @@
                                     <label class="radio-btn"><input type="radio" name="scoliosis" value="是"><span class="circle"></span><span>是</span></label>
                                     <label class="radio-btn"><input type="radio" name="scoliosis" value="否"><span class="circle"></span><span>否</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="scoliosisNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">胸椎</div>
@@ -1183,6 +1218,7 @@
                                     <label class="radio-btn"><input type="radio" name="thoracicCurve" value="向左"><span class="circle"></span><span>向左</span></label>
                                     <label class="radio-btn"><input type="radio" name="thoracicCurve" value="向右"><span class="circle"></span><span>向右</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="thoracicCurveNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">腰椎</div>
@@ -1191,8 +1227,8 @@
                                     <label class="radio-btn"><input type="radio" name="lumbarCurve" value="向左"><span class="circle"></span><span>向左</span></label>
                                     <label class="radio-btn"><input type="radio" name="lumbarCurve" value="向右"><span class="circle"></span><span>向右</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="lumbarCurveNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step1Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="2">
@@ -1205,8 +1241,8 @@
                                     <label class="radio-btn"><input type="radio" name="cervical" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 8px;"><input type="number" id="cervicalDegree" placeholder="11"><span>度</span></div>
+                                <input type="text" class="item-note-input" id="cervicalNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step2Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="3">
@@ -1219,8 +1255,8 @@
                                     <label class="radio-btn"><input type="radio" name="thoracic" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 8px;"><input type="number" id="thoracicDegree" placeholder="36"><span>度</span></div>
+                                <input type="text" class="item-note-input" id="thoracicNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step3Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="4">
@@ -1233,8 +1269,8 @@
                                     <label class="radio-btn"><input type="radio" name="lumbar" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 8px;"><input type="number" id="lumbarDegree" placeholder="35"><span>度</span></div>
+                                <input type="text" class="item-note-input" id="lumbarNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step4Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="5">
@@ -1247,6 +1283,7 @@
                                     <label class="radio-btn"><input type="radio" name="pelvisTilt" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 6px;"><input type="number" id="pelvisTiltDegree" placeholder="0"><span>度</span></div>
+                                <input type="text" class="item-note-input" id="pelvisTiltNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">2. 左右高低</div>
@@ -1259,6 +1296,7 @@
                                     <label class="radio-btn"><input type="radio" name="pelvisUpDown" value="上提"><span class="circle"></span><span>上提</span></label>
                                     <label class="radio-btn"><input type="radio" name="pelvisUpDown" value="下降"><span class="circle"></span><span>下降</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="pelvisSideNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">3. 旋轉</div>
@@ -1267,12 +1305,13 @@
                                     <label class="radio-btn"><input type="radio" name="pelvisRotation" value="向右旋轉"><span class="circle"></span><span>向右旋轉</span></label>
                                     <label class="radio-btn"><input type="radio" name="pelvisRotation" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="pelvisRotationNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">4. 功能性後傾</div>
                                 <label class="checkbox-label" style="padding: 6px 10px; display: inline-flex;"><input type="checkbox" id="functionalTilt"><span>可能功能性後傾</span></label>
+                                <input type="text" class="item-note-input" id="functionalTiltNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step5Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="6">
@@ -1285,6 +1324,7 @@
                                     <label class="radio-btn"><input type="radio" name="leftKnee" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 6px;"><input type="number" id="leftKneeDegree" placeholder="0"><span>度</span></div>
+                                <input type="text" class="item-note-input" id="leftKneeNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">2. 右腳</div>
@@ -1294,8 +1334,8 @@
                                     <label class="radio-btn"><input type="radio" name="rightKnee" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 6px;"><input type="number" id="rightKneeDegree" placeholder="0"><span>度</span></div>
+                                <input type="text" class="item-note-input" id="rightKneeNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step6Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="7">
@@ -1307,6 +1347,7 @@
                                     <label class="radio-btn"><input type="radio" name="arch" value="外翻(低足弓)"><span class="circle"></span><span>外翻(低足弓)</span></label>
                                     <label class="radio-btn"><input type="radio" name="arch" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="archNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">2. 足部旋轉</div>
@@ -1315,8 +1356,8 @@
                                     <label class="radio-btn"><input type="radio" name="footRotation" value="內旋(內八)"><span class="circle"></span><span>內旋(內八)</span></label>
                                     <label class="radio-btn"><input type="radio" name="footRotation" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="footRotationNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step7Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="8">
@@ -1327,6 +1368,7 @@
                                     <label class="radio-btn"><input type="radio" name="shrug" value="是"><span class="circle"></span><span>是</span></label>
                                     <label class="radio-btn"><input type="radio" name="shrug" value="否"><span class="circle"></span><span>否</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="shrugNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">2. 圓肩</div>
@@ -1334,6 +1376,7 @@
                                     <label class="radio-btn"><input type="radio" name="roundShoulder" value="是"><span class="circle"></span><span>是</span></label>
                                     <label class="radio-btn"><input type="radio" name="roundShoulder" value="否"><span class="circle"></span><span>否</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="roundShoulderNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">3. 肩胛骨</div>
@@ -1343,6 +1386,7 @@
                                     <label class="radio-btn"><input type="radio" name="scapula" value="下迴旋異常"><span class="circle"></span><span>下迴旋異常</span></label>
                                     <label class="radio-btn"><input type="radio" name="scapula" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="scapulaNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">4. 肱骨</div>
@@ -1351,8 +1395,8 @@
                                     <label class="radio-btn"><input type="radio" name="humerus" value="內旋"><span class="circle"></span><span>內旋</span></label>
                                     <label class="radio-btn"><input type="radio" name="humerus" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="humerusNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step8Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="9">
@@ -1364,6 +1408,7 @@
                                     <label class="radio-btn"><input type="radio" name="hip" value="外旋"><span class="circle"></span><span>外旋</span></label>
                                     <label class="radio-btn"><input type="radio" name="hip" value="正常"><span class="circle"></span><span>正常</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="hipNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">膝關節 - 動態是否不穩</div>
@@ -1371,6 +1416,7 @@
                                     <label class="radio-btn"><input type="radio" name="kneeStability" value="是"><span class="circle"></span><span>是</span></label>
                                     <label class="radio-btn"><input type="radio" name="kneeStability" value="否"><span class="circle"></span><span>否</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="kneeStabilityNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">踝關節 - 動態是否不穩</div>
@@ -1378,8 +1424,8 @@
                                     <label class="radio-btn"><input type="radio" name="ankleStability" value="是"><span class="circle"></span><span>是</span></label>
                                     <label class="radio-btn"><input type="radio" name="ankleStability" value="否"><span class="circle"></span><span>否</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="ankleStabilityNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step9Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="skeleton-step" data-step="10">
@@ -1390,6 +1436,7 @@
                                     <label class="radio-btn"><input type="radio" name="breathingShallow" value="是"><span class="circle"></span><span>是</span></label>
                                     <label class="radio-btn"><input type="radio" name="breathingShallow" value="否"><span class="circle"></span><span>否</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="breathingShallowNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">呼吸模式</div>
@@ -1399,8 +1446,8 @@
                                     <label class="radio-btn"><input type="radio" name="breathingPattern" value="腹腔"><span class="circle"></span><span>腹腔</span></label>
                                     <label class="radio-btn"><input type="radio" name="breathingPattern" value="初步沒有太大問題"><span class="circle"></span><span>初步沒有太大問題</span></label>
                                 </div>
+                                <input type="text" class="item-note-input" id="breathingPatternNote" placeholder="備註...">
                             </div>
-                            <textarea class="step-note-input" id="step10Note" placeholder="備註說明..."></textarea>
                         </div>
 
                         <div class="step-nav">
@@ -1554,7 +1601,7 @@
         // ==================== 設定區（請填入） ====================
         var CONFIG = {
             // 【請填入】Make Webhook URL（查詢會員 + 提交評估）
-            MAKE_WEBHOOK_URL: 'https://hook.us2.make.com/vsk129ur2xv54sscfoflt5aacil4mws2',
+            MAKE_WEBHOOK_URL: 'https://hook.us2.make.com/vsk129ur2xv54sscfoflt5aacil4mws2L',
             
             // 【請填入】Apps Script URL（ImageKit 簽名）
             IMAGEKIT_AUTH_URL: 'https://script.google.com/macros/s/AKfycbyoVmFxHHtH8xnHlvUVrADYOepAywFyTLh9GSql8LMiahIdgxNMedrI0elfT1yDr2Fw/exec',
@@ -1825,7 +1872,7 @@
                 '<span class="detail-value">' + (h.total_courses || 0) + ' 堂</span>' +
                 '</div>';
             
-            // 如果有更多資料可以顯示
+            // 短期目標
             if (h.short_term_goal) {
                 html += '<div class="detail-row">' +
                     '<span class="detail-label">🎯 短期目標</span>' +
@@ -1833,9 +1880,101 @@
                     '</div>';
             }
             
+            // 骨骼評估備註
+            var skeletonNotes = collectHistorySkeletonNotes(h);
+            if (skeletonNotes.length > 0) {
+                html += '<div class="detail-row">' +
+                    '<span class="detail-label">🦴 骨骼評估備註</span>' +
+                    '<div class="note-list">' + skeletonNotes.map(function(n) {
+                        return '<div class="note-item"><span class="note-title">' + n.title + '：</span>' + n.content + '</div>';
+                    }).join('') + '</div>' +
+                    '</div>';
+            }
+            
+            // 肌肉評估備註
+            var muscleNotes = collectHistoryMuscleNotes(h);
+            if (muscleNotes.length > 0) {
+                html += '<div class="detail-row">' +
+                    '<span class="detail-label">💪 肌肉評估備註</span>' +
+                    '<div class="note-list">' + muscleNotes.map(function(n) {
+                        return '<div class="note-item"><span class="note-title">' + n.title + '：</span>' + n.content + '</div>';
+                    }).join('') + '</div>' +
+                    '</div>';
+            }
+            
             html += '</div></div>';
             
             document.getElementById('timelineDetail').innerHTML = html;
+        }
+        
+        function collectHistorySkeletonNotes(h) {
+            var notes = [];
+            var noteMapping = [
+                { key: 'note_scoliosis', title: '脊椎側彎' },
+                { key: 'note_thoracic_curve', title: '胸椎側彎' },
+                { key: 'note_lumbar_curve', title: '腰椎側彎' },
+                { key: 'note_cervical', title: '頸椎' },
+                { key: 'note_thoracic', title: '胸椎' },
+                { key: 'note_lumbar', title: '腰椎' },
+                { key: 'note_pelvis_tilt', title: '骨盆前後傾' },
+                { key: 'note_pelvis_side', title: '骨盆左右高低' },
+                { key: 'note_pelvis_rotation', title: '骨盆旋轉' },
+                { key: 'note_functional_tilt', title: '功能性後傾' },
+                { key: 'note_left_knee', title: '左膝' },
+                { key: 'note_right_knee', title: '右膝' },
+                { key: 'note_arch', title: '足弓' },
+                { key: 'note_foot_rotation', title: '足部旋轉' },
+                { key: 'note_shrug', title: '聳肩' },
+                { key: 'note_round_shoulder', title: '圓肩' },
+                { key: 'note_scapula', title: '肩胛骨' },
+                { key: 'note_humerus', title: '肱骨' },
+                { key: 'note_hip', title: '髖關節' },
+                { key: 'note_knee_stability', title: '膝關節穩定' },
+                { key: 'note_ankle_stability', title: '踝關節穩定' },
+                { key: 'note_breathing_shallow', title: '呼吸短淺' },
+                { key: 'note_breathing_pattern', title: '呼吸模式' }
+            ];
+            
+            noteMapping.forEach(function(item) {
+                if (h[item.key] && h[item.key].trim()) {
+                    notes.push({ title: item.title, content: h[item.key] });
+                }
+            });
+            
+            return notes;
+        }
+        
+        function collectHistoryMuscleNotes(h) {
+            var notes = [];
+            if (!h.muscle_data) return notes;
+            
+            try {
+                var muscleData = typeof h.muscle_data === 'string' ? JSON.parse(h.muscle_data) : h.muscle_data;
+                var groupNames = {
+                    shoulder: '肩膀',
+                    chest: '胸部',
+                    back: '背部',
+                    core: '核心',
+                    glute: '臀部',
+                    leg: '腿部'
+                };
+                
+                Object.keys(muscleData).forEach(function(group) {
+                    var muscles = muscleData[group];
+                    if (Array.isArray(muscles)) {
+                        muscles.forEach(function(m) {
+                            if (m.note && m.note.trim()) {
+                                var title = (groupNames[group] || group) + ' - ' + (m.name || '未命名');
+                                notes.push({ title: title, content: m.note });
+                            }
+                        });
+                    }
+                });
+            } catch (e) {
+                console.error('Parse muscle_data error:', e);
+            }
+            
+            return notes;
         }
 
         function showMemberError(msg) {
@@ -2067,12 +2206,82 @@
                 risks: {
                     risk1: document.getElementById('risk1').value,
                     risk2: document.getElementById('risk2').value,
-                    risk3: document.getElementById('risk3').value,
-                    note: document.getElementById('step0Note').value
+                    risk3: document.getElementById('risk3').value
                 },
                 
-                // 骨骼評估
-                skeleton: collectSkeletonData(),
+                // 骨骼評估（獨立欄位）
+                skeleton: {
+                    // 步驟1 脊椎側彎
+                    scoliosis: document.querySelector('input[name="scoliosis"]:checked')?.value || '',
+                    thoracicCurveDegree: document.getElementById('thoracicCurveDegree').value,
+                    thoracicCurveDirection: document.querySelector('input[name="thoracicCurve"]:checked')?.value || '',
+                    lumbarCurveDegree: document.getElementById('lumbarCurveDegree').value,
+                    lumbarCurveDirection: document.querySelector('input[name="lumbarCurve"]:checked')?.value || '',
+                    // 步驟2 頸椎
+                    cervicalStatus: document.querySelector('input[name="cervical"]:checked')?.value || '',
+                    cervicalDegree: document.getElementById('cervicalDegree').value,
+                    // 步驟3 胸椎
+                    thoracicStatus: document.querySelector('input[name="thoracic"]:checked')?.value || '',
+                    thoracicDegree: document.getElementById('thoracicDegree').value,
+                    // 步驟4 腰椎
+                    lumbarStatus: document.querySelector('input[name="lumbar"]:checked')?.value || '',
+                    lumbarDegree: document.getElementById('lumbarDegree').value,
+                    // 步驟5 骨盆
+                    pelvisTilt: document.querySelector('input[name="pelvisTilt"]:checked')?.value || '',
+                    pelvisTiltDegree: document.getElementById('pelvisTiltDegree').value,
+                    pelvisSide: document.querySelector('input[name="pelvisSide"]:checked')?.value || '',
+                    pelvisSideDegree: document.getElementById('pelvisSideDegree').value,
+                    pelvisUpDown: document.querySelector('input[name="pelvisUpDown"]:checked')?.value || '',
+                    pelvisRotation: document.querySelector('input[name="pelvisRotation"]:checked')?.value || '',
+                    functionalTilt: document.getElementById('functionalTilt').checked ? '是' : '否',
+                    // 步驟6 膝蓋
+                    leftKnee: document.querySelector('input[name="leftKnee"]:checked')?.value || '',
+                    leftKneeDegree: document.getElementById('leftKneeDegree').value,
+                    rightKnee: document.querySelector('input[name="rightKnee"]:checked')?.value || '',
+                    rightKneeDegree: document.getElementById('rightKneeDegree').value,
+                    // 步驟7 腳踝
+                    arch: document.querySelector('input[name="arch"]:checked')?.value || '',
+                    footRotation: document.querySelector('input[name="footRotation"]:checked')?.value || '',
+                    // 步驟8 肩關節
+                    shrug: document.querySelector('input[name="shrug"]:checked')?.value || '',
+                    roundShoulder: document.querySelector('input[name="roundShoulder"]:checked')?.value || '',
+                    scapula: document.querySelector('input[name="scapula"]:checked')?.value || '',
+                    humerus: document.querySelector('input[name="humerus"]:checked')?.value || '',
+                    // 步驟9 髖膝踝
+                    hip: document.querySelector('input[name="hip"]:checked')?.value || '',
+                    kneeStability: document.querySelector('input[name="kneeStability"]:checked')?.value || '',
+                    ankleStability: document.querySelector('input[name="ankleStability"]:checked')?.value || '',
+                    // 步驟10 呼吸
+                    breathingShallow: document.querySelector('input[name="breathingShallow"]:checked')?.value || '',
+                    breathingPattern: document.querySelector('input[name="breathingPattern"]:checked')?.value || ''
+                },
+                
+                // 骨骼評估備註（獨立欄位）
+                skeletonNotes: {
+                    scoliosis: document.getElementById('scoliosisNote')?.value || '',
+                    thoracicCurve: document.getElementById('thoracicCurveNote')?.value || '',
+                    lumbarCurve: document.getElementById('lumbarCurveNote')?.value || '',
+                    cervical: document.getElementById('cervicalNote')?.value || '',
+                    thoracic: document.getElementById('thoracicNote')?.value || '',
+                    lumbar: document.getElementById('lumbarNote')?.value || '',
+                    pelvisTilt: document.getElementById('pelvisTiltNote')?.value || '',
+                    pelvisSide: document.getElementById('pelvisSideNote')?.value || '',
+                    pelvisRotation: document.getElementById('pelvisRotationNote')?.value || '',
+                    functionalTilt: document.getElementById('functionalTiltNote')?.value || '',
+                    leftKnee: document.getElementById('leftKneeNote')?.value || '',
+                    rightKnee: document.getElementById('rightKneeNote')?.value || '',
+                    arch: document.getElementById('archNote')?.value || '',
+                    footRotation: document.getElementById('footRotationNote')?.value || '',
+                    shrug: document.getElementById('shrugNote')?.value || '',
+                    roundShoulder: document.getElementById('roundShoulderNote')?.value || '',
+                    scapula: document.getElementById('scapulaNote')?.value || '',
+                    humerus: document.getElementById('humerusNote')?.value || '',
+                    hip: document.getElementById('hipNote')?.value || '',
+                    kneeStability: document.getElementById('kneeStabilityNote')?.value || '',
+                    ankleStability: document.getElementById('ankleStabilityNote')?.value || '',
+                    breathingShallow: document.getElementById('breathingShallowNote')?.value || '',
+                    breathingPattern: document.getElementById('breathingPatternNote')?.value || ''
+                },
                 
                 // 肌肉張力
                 muscles: collectMuscleData(),
@@ -2093,79 +2302,8 @@
                 }
             };
             
+            
             return data;
-        }
-
-        function collectSkeletonData() {
-            return {
-                scoliosis: document.querySelector('input[name="scoliosis"]:checked')?.value || '',
-                thoracicCurve: {
-                    degree: document.getElementById('thoracicCurveDegree').value,
-                    direction: document.querySelector('input[name="thoracicCurve"]:checked')?.value || ''
-                },
-                lumbarCurve: {
-                    degree: document.getElementById('lumbarCurveDegree').value,
-                    direction: document.querySelector('input[name="lumbarCurve"]:checked')?.value || ''
-                },
-                cervical: {
-                    status: document.querySelector('input[name="cervical"]:checked')?.value || '',
-                    degree: document.getElementById('cervicalDegree').value
-                },
-                thoracic: {
-                    status: document.querySelector('input[name="thoracic"]:checked')?.value || '',
-                    degree: document.getElementById('thoracicDegree').value
-                },
-                lumbar: {
-                    status: document.querySelector('input[name="lumbar"]:checked')?.value || '',
-                    degree: document.getElementById('lumbarDegree').value
-                },
-                pelvis: {
-                    tilt: document.querySelector('input[name="pelvisTilt"]:checked')?.value || '',
-                    tiltDegree: document.getElementById('pelvisTiltDegree').value,
-                    side: document.querySelector('input[name="pelvisSide"]:checked')?.value || '',
-                    sideDegree: document.getElementById('pelvisSideDegree').value,
-                    upDown: document.querySelector('input[name="pelvisUpDown"]:checked')?.value || '',
-                    rotation: document.querySelector('input[name="pelvisRotation"]:checked')?.value || '',
-                    functionalTilt: document.getElementById('functionalTilt').checked
-                },
-                knee: {
-                    left: document.querySelector('input[name="leftKnee"]:checked')?.value || '',
-                    leftDegree: document.getElementById('leftKneeDegree').value,
-                    right: document.querySelector('input[name="rightKnee"]:checked')?.value || '',
-                    rightDegree: document.getElementById('rightKneeDegree').value
-                },
-                ankle: {
-                    arch: document.querySelector('input[name="arch"]:checked')?.value || '',
-                    footRotation: document.querySelector('input[name="footRotation"]:checked')?.value || ''
-                },
-                shoulder: {
-                    shrug: document.querySelector('input[name="shrug"]:checked')?.value || '',
-                    roundShoulder: document.querySelector('input[name="roundShoulder"]:checked')?.value || '',
-                    scapula: document.querySelector('input[name="scapula"]:checked')?.value || '',
-                    humerus: document.querySelector('input[name="humerus"]:checked')?.value || ''
-                },
-                joints: {
-                    hip: document.querySelector('input[name="hip"]:checked')?.value || '',
-                    kneeStability: document.querySelector('input[name="kneeStability"]:checked')?.value || '',
-                    ankleStability: document.querySelector('input[name="ankleStability"]:checked')?.value || ''
-                },
-                breathing: {
-                    shallow: document.querySelector('input[name="breathingShallow"]:checked')?.value || '',
-                    pattern: document.querySelector('input[name="breathingPattern"]:checked')?.value || ''
-                },
-                notes: {
-                    step1: document.getElementById('step1Note').value,
-                    step2: document.getElementById('step2Note').value,
-                    step3: document.getElementById('step3Note').value,
-                    step4: document.getElementById('step4Note').value,
-                    step5: document.getElementById('step5Note').value,
-                    step6: document.getElementById('step6Note').value,
-                    step7: document.getElementById('step7Note').value,
-                    step8: document.getElementById('step8Note').value,
-                    step9: document.getElementById('step9Note').value,
-                    step10: document.getElementById('step10Note').value
-                }
-            };
         }
 
         function collectMuscleData() {
@@ -2375,6 +2513,14 @@
 
         function addMuscleEntry(containerId, group) {
             var container = document.getElementById(containerId);
+            
+            // 限制最多10個肌肉
+            var existingEntries = container.querySelectorAll('.muscle-entry');
+            if (existingEntries.length >= 10) {
+                alert('每個肌群最多只能新增 10 個肌肉部位');
+                return;
+            }
+            
             var hint = container.querySelector('.empty-muscle-hint');
             if (hint) hint.remove();
             
