@@ -1980,8 +1980,12 @@
                 
                 if (result.success && result.member) {
                     memberData = result.member;
-                    showMemberResult(result.member, result.history || []);
-                    fillPersonalData(result.member); // 自動填入個人資料
+                    var history = result.history || [];
+                    showMemberResult(result.member, history);
+                    
+                    // 自動填入個人資料：優先用最新歷史紀錄，沒有則用諮詢單資料
+                    var latestHistory = history.length > 0 ? history[0] : null;
+                    fillPersonalData(result.member, latestHistory);
                 } else {
                     showMemberError('查無此會員，請確認姓名和電話是否正確，或先至系統建檔');
                 }
@@ -2054,66 +2058,90 @@
         }
         
         // 填入個人資料（從諮詢單/MySQL）
-        function fillPersonalData(member) {
-            console.log('fillPersonalData 被呼叫，資料：', member);
+        // 填入個人資料（優先用歷史紀錄，沒有才用諮詢單資料）
+        function fillPersonalData(member, history) {
+            var hasHistory = history && (history.goals || history.diseases || history.notes);
+            console.log('fillPersonalData 被呼叫，有歷史：', hasHistory);
             
-            // 1. 填入健身目標（分隔符：逗號、頓號、斜線）
-            if (member.goals) {
-                var goals = member.goals.split(/[,、，\/]/);
-                console.log('健身目標解析：', goals);
-                goals.forEach(function(goal) {
-                    goal = goal.trim();
-                    if (!goal) return;
-                    document.querySelectorAll('input[name="goals"]').forEach(function(cb) {
-                        if (cb.value === goal || goal.includes(cb.value) || cb.value.includes(goal)) {
-                            cb.checked = true;
-                            cb.closest('.checkbox-label').classList.add('selected');
-                            console.log('勾選目標：', cb.value);
-                        }
+            // 決定資料來源
+            var goalsData = (history && history.goals) ? history.goals : member.goals;
+            var diseasesData = (history && history.diseases) ? history.diseases : member.medical_history;
+            var notesData = (history && history.notes) ? history.notes : member.consultation_notes;
+            var exerciseData = member.exercise_exp; // 運動經驗只從諮詢單來
+            
+            var hasData = false;
+            
+            // 1. 填入健身目標
+            if (goalsData) {
+                hasData = true;
+                var goals = goalsData;
+                // 如果是 JSON 字串，解析它
+                if (typeof goals === 'string') {
+                    try {
+                        goals = JSON.parse(goals);
+                    } catch (e) {
+                        goals = goals.split(/[,、，\/]/);
+                    }
+                }
+                if (Array.isArray(goals)) {
+                    goals.forEach(function(goal) {
+                        goal = String(goal).trim();
+                        if (!goal) return;
+                        document.querySelectorAll('input[name="goals"]').forEach(function(cb) {
+                            if (cb.value === goal || goal.includes(cb.value) || cb.value.includes(goal)) {
+                                cb.checked = true;
+                                cb.closest('.checkbox-label').classList.add('selected');
+                            }
+                        });
                     });
-                });
+                }
             }
             
-            // 2. 填入疾病史（分隔符：逗號、頓號）
-            if (member.medical_history) {
-                var diseases = member.medical_history.split(/[,、，]/);
-                console.log('疾病史解析：', diseases);
-                diseases.forEach(function(disease) {
-                    disease = disease.trim();
-                    if (!disease) return;
-                    
-                    // 處理帶說明的疾病（如：關節問題：左膝疼痛）
-                    var baseName = disease.split(/[:：]/)[0].trim();
-                    var detail = disease.split(/[:：]/)[1] ? disease.split(/[:：]/)[1].trim() : '';
-                    
-                    document.querySelectorAll('input[name="disease"]').forEach(function(cb) {
-                        if (cb.value === baseName || baseName.includes(cb.value) || cb.value.includes(baseName)) {
-                            cb.checked = true;
-                            cb.closest('.checkbox-label').classList.add('selected');
-                            console.log('勾選疾病：', cb.value);
-                            
-                            // 填入詳細說明
-                            if (detail) {
-                                if (baseName === '關節問題' || baseName.includes('關節')) {
-                                    var input = document.getElementById('jointInput');
-                                    if (input) { input.value = detail; input.disabled = false; }
-                                } else if (baseName === '脊椎問題' || baseName.includes('脊椎')) {
-                                    var input = document.getElementById('spineInput');
-                                    if (input) { input.value = detail; input.disabled = false; }
-                                } else if (baseName === '其他') {
-                                    var input = document.getElementById('otherDiseaseInput');
-                                    if (input) { input.value = detail; input.disabled = false; }
+            // 2. 填入疾病史
+            if (diseasesData) {
+                hasData = true;
+                var diseases = diseasesData;
+                if (typeof diseases === 'string') {
+                    try {
+                        diseases = JSON.parse(diseases);
+                    } catch (e) {
+                        diseases = diseases.split(/[,、，]/);
+                    }
+                }
+                if (Array.isArray(diseases)) {
+                    diseases.forEach(function(disease) {
+                        disease = String(disease).trim();
+                        if (!disease) return;
+                        var baseName = disease.split(/[:：]/)[0].trim();
+                        var detail = disease.split(/[:：]/)[1] ? disease.split(/[:：]/)[1].trim() : '';
+                        
+                        document.querySelectorAll('input[name="disease"]').forEach(function(cb) {
+                            if (cb.value === baseName || baseName.includes(cb.value) || cb.value.includes(baseName)) {
+                                cb.checked = true;
+                                cb.closest('.checkbox-label').classList.add('selected');
+                                
+                                if (detail) {
+                                    if (baseName === '關節問題' || baseName.includes('關節')) {
+                                        var input = document.getElementById('jointInput');
+                                        if (input) { input.value = detail; input.disabled = false; }
+                                    } else if (baseName === '脊椎問題' || baseName.includes('脊椎')) {
+                                        var input = document.getElementById('spineInput');
+                                        if (input) { input.value = detail; input.disabled = false; }
+                                    } else if (baseName === '其他') {
+                                        var input = document.getElementById('otherDiseaseInput');
+                                        if (input) { input.value = detail; input.disabled = false; }
+                                    }
                                 }
                             }
-                        }
+                        });
                     });
-                });
+                }
             }
             
-            // 3. 填入運動經驗
-            if (member.exercise_exp) {
-                var expValue = member.exercise_exp.trim();
-                console.log('運動經驗：', expValue);
+            // 3. 填入運動經驗（只從諮詢單來，歷史紀錄不存這個）
+            if (exerciseData && !hasHistory) {
+                hasData = true;
+                var expValue = exerciseData.trim();
                 if (expValue === '無') {
                     var noExpCb = document.querySelector('input[name="exercise"][value="無"]');
                     if (noExpCb) {
@@ -2127,24 +2155,28 @@
                         hasExpCb.closest('.checkbox-label').classList.add('selected');
                         toggleExerciseDetails();
                         
-                        // 解析運動經驗詳情（如：有: 滑步機）
                         var expDetail = expValue.replace(/^有[:：]?\s*/, '');
                         if (expDetail) {
                             document.getElementById('exerciseType').value = expDetail;
-                            console.log('運動項目：', expDetail);
                         }
                     }
                 }
             }
             
-            // 4. 填入備註（諮詢單備註）
-            if (member.consultation_notes) {
-                document.getElementById('notes').value = member.consultation_notes;
-                console.log('備註：', member.consultation_notes);
+            // 4. 填入備註
+            if (notesData) {
+                hasData = true;
+                document.getElementById('notes').value = notesData;
             }
             
             // 顯示提示
-            showToast('已載入諮詢單資料，可編輯調整');
+            if (hasData) {
+                if (hasHistory) {
+                    showToast('已載入上次檢測資料，可編輯調整');
+                } else {
+                    showToast('已載入諮詢單資料，可編輯調整');
+                }
+            }
         }
         
         function showHistoryDetail(index) {
