@@ -555,6 +555,79 @@
             transition: all 0.3s ease; z-index: 1000;
         }
         .toast.show { transform: translateY(0); opacity: 1; }
+        
+        /* 成功頁面 */
+        .success-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+        .success-overlay.active {
+            display: flex;
+        }
+        .success-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(122, 193, 154, 0.4);
+        }
+        .success-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-bottom: 15px;
+        }
+        .success-message {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .success-details {
+            background: var(--green-light);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .success-details p {
+            margin: 6px 0;
+        }
+        .success-details strong {
+            color: var(--green-dark);
+        }
+        .success-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+        }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--green-light); border-radius: 10px; }
@@ -1596,6 +1669,19 @@
     </div>
 
     <div class="toast" id="toast"></div>
+    
+    <!-- 成功頁面 -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-box">
+            <div class="success-icon">✓</div>
+            <h2 class="success-title">提交成功！</h2>
+            <p class="success-message">評估報告已成功提交</p>
+            <p class="success-message">圖片已完成上傳</p>
+            <div class="success-details" id="successDetails"></div>
+            <button class="btn btn-primary success-btn" onclick="closeSuccessAndReset()">完成，開始新評估</button>
+            <button class="btn btn-secondary success-btn" onclick="closeSuccess()" style="margin-top: 10px;">關閉</button>
+        </div>
+    </div>
 
     <script>
         // ==================== 設定區（請填入） ====================
@@ -2414,8 +2500,7 @@
                 document.getElementById('submitBtn').disabled = false;
                 
                 if (result.success) {
-                    showToast('評估報告已提交成功！');
-                    // 可選：重置表單或跳轉頁面
+                    showSuccess(formData, imageData);
                 } else {
                     showToast('提交失敗：' + (result.error || '未知錯誤'));
                 }
@@ -2425,6 +2510,26 @@
                 showToast('提交失敗，請稍後再試');
                 console.error('Submit error:', error);
             }
+        }
+        
+        function showSuccess(formData, imageData) {
+            var details = '<p><strong>會員姓名：</strong>' + formData.memberName + '</p>' +
+                '<p><strong>檢測日期：</strong>' + formData.assessmentDate + '</p>' +
+                '<p><strong>Moti 照片：</strong>' + (imageData.motiUrls.length || 0) + ' 張已上傳</p>' +
+                '<p><strong>InBody 照片：</strong>' + (imageData.inbodyUrl ? '1 張已上傳' : '無') + '</p>';
+            
+            document.getElementById('successDetails').innerHTML = details;
+            document.getElementById('successOverlay').classList.add('active');
+        }
+        
+        function closeSuccess() {
+            document.getElementById('successOverlay').classList.remove('active');
+        }
+        
+        function closeSuccessAndReset() {
+            closeSuccess();
+            // 重置表單
+            location.reload();
         }
 
         // ==================== 工具函數 ====================
