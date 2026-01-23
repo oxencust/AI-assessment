@@ -1251,7 +1251,13 @@
                     <button class="btn btn-search" onclick="searchMember()">🔍 查詢</button>
                 </div>
                 <div id="memberSearchResult"></div>
-                <div class="form-group" style="margin-top: 15px;"><label class="form-label">檢測日期</label><input type="date" class="form-input" id="assessmentDate"></div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label class="form-label">檢測日期時間</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="date" class="form-input" id="assessmentDate" style="flex: 1;">
+                        <input type="time" class="form-input" id="assessmentTime" style="flex: 1;">
+                    </div>
+                </div>
                 <div class="form-group" id="analystGroup" style="display: none;">
                     <label class="form-label">分析師</label>
                     <div class="analyst-display" id="analystDisplay">
@@ -1331,8 +1337,8 @@
                     <div class="body-viewer">
                         <div class="body-image-wrapper">
                             <div class="body-image-container">
-                                <img src="https://ik.imagekit.io/hanhealth/assets/body-front.png" alt="正面+側面" class="body-image active" id="skeletonFS">
-                                <img src="https://ik.imagekit.io/hanhealth/assets/body-back.png" alt="正面+背面" class="body-image" id="skeletonFB">
+                                <img src="" alt="正面+側面" class="body-image active" id="skeletonFS">
+                                <img src="" alt="正面+背面" class="body-image" id="skeletonFB">
                                 <div class="hotspot-overlay" id="skeletonOverlay"></div>
                             </div>
                         </div>
@@ -1623,7 +1629,7 @@
                     <div class="body-viewer">
                         <div class="body-image-wrapper" style="background: linear-gradient(135deg, var(--pink-light) 0%, var(--yellow-light) 100%);">
                             <div class="body-image-container">
-                                <img src="https://ik.imagekit.io/hanhealth/assets/body-side.png" alt="肌肉圖" class="body-image active" id="muscleImage">
+                                <img src="" alt="肌肉圖" class="body-image active" id="muscleImage">
                                 <div class="hotspot-overlay" id="muscleOverlay"></div>
                             </div>
                         </div>
@@ -1657,11 +1663,11 @@
                 <div class="form-group">
                     <label class="form-label">建議課程（6個月內）</label>
                     <div class="course-suggestion-box">
-                        <div class="course-total-row"><label>總堂數</label><div class="inline-form" style="margin: 0;"><input type="number" id="totalCourses" placeholder="0" style="width: 80px;"><span>堂</span></div></div>
+                        <div class="course-total-row"><label>總堂數</label><div class="inline-form" style="margin: 0;"><input type="number" id="totalCourses" placeholder="0" style="width: 80px;" readonly><span>堂</span></div></div>
                         <div class="course-detail-row">
-                            <div class="course-detail-item"><label>重訓</label><div class="inline-form"><input type="number" id="weightTraining" placeholder="0"><span>堂</span></div></div>
-                            <div class="course-detail-item"><label>皮拉提斯</label><div class="inline-form"><input type="number" id="pilatesTraining" placeholder="0"><span>堂</span></div></div>
-                            <div class="course-detail-item"><label>伸展</label><div class="inline-form"><input type="number" id="stretchTraining" placeholder="0"><span>堂</span></div></div>
+                            <div class="course-detail-item"><label>重訓</label><div class="inline-form"><input type="number" id="weightTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div></div>
+                            <div class="course-detail-item"><label>皮拉提斯</label><div class="inline-form"><input type="number" id="pilatesTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div></div>
+                            <div class="course-detail-item"><label>伸展</label><div class="inline-form"><input type="number" id="stretchTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div></div>
                         </div>
                     </div>
                 </div>
@@ -1781,6 +1787,11 @@
             // 【請填入】GitHub Pages 相簿網址（格式：https://你的帳號.github.io/moti-album/）
             ALBUM_BASE_URL: 'https://oxencust.github.io/moti-album/',
             
+            // 【請填入】骨骼肌肉圖 URL（上傳到 ImageKit 後填入）
+            BODY_FRONT_URL: 'https://ik.imagekit.io/hanhealth/assets/body-front.png',
+            BODY_BACK_URL: 'https://ik.imagekit.io/hanhealth/assets/body-back.png',
+            BODY_SIDE_URL: 'https://ik.imagekit.io/hanhealth/assets/body-side.png',
+            
             // 圖片壓縮設定（不用改）
             MAX_IMAGE_WIDTH: 1200,
             IMAGE_QUALITY: 0.7,
@@ -1797,6 +1808,7 @@
         var memberData = null;
         var historyData = [];
         var currentPage = 1, currentSkeletonStep = 0, currentMuscleStepIndex = 0, muscleEntryCounter = 0;
+        var lastMuscleInput = null; // 追蹤最近新增的肌肉輸入框
 
         // 熱點座標
         var hotspotsFS = [
@@ -1912,7 +1924,18 @@
 
         // ==================== 初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('assessmentDate').valueAsDate = new Date();
+            // 設定骨骼肌肉圖片 URL
+            document.getElementById('skeletonFS').src = CONFIG.BODY_FRONT_URL;
+            document.getElementById('skeletonFB').src = CONFIG.BODY_BACK_URL;
+            document.getElementById('muscleImage').src = CONFIG.BODY_SIDE_URL;
+            
+            // 設定預設日期和時間
+            var now = new Date();
+            document.getElementById('assessmentDate').valueAsDate = now;
+            var hours = String(now.getHours()).padStart(2, '0');
+            var minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('assessmentTime').value = hours + ':' + minutes;
+            
             initMuscleHotspots();
             initDragDrop();
             updateSkeletonStep();
@@ -2636,12 +2659,17 @@
 
         // ==================== 表單收集與提交 ====================
         function collectFormData() {
+            var dateValue = document.getElementById('assessmentDate').value;
+            var timeValue = document.getElementById('assessmentTime').value || '00:00';
+            
             var data = {
                 // 會員資料（優先使用查詢結果）
                 memberId: memberData ? memberData.id : '',
                 memberName: memberData ? memberData.name : document.getElementById('memberName').value,
                 memberPhone: memberData ? memberData.phone : document.getElementById('memberPhone').value,
-                assessmentDate: document.getElementById('assessmentDate').value,
+                assessmentDate: dateValue,
+                assessmentTime: timeValue,
+                assessmentDateTime: dateValue + ' ' + timeValue + ':00',
                 
                 // 分析師資料
                 analystId: analystData ? analystData.id : '',
@@ -2903,6 +2931,11 @@
         async function submitAssessment() {
             var formData = collectFormData();
             
+            // Debug: 確認日期時間值
+            console.log('提交時的日期:', formData.assessmentDate);
+            console.log('提交時的時間:', formData.assessmentTime);
+            console.log('完整日期時間:', formData.assessmentDateTime);
+            
             // 驗證必填
             if (!formData.memberName || !formData.memberPhone) {
                 showToast('請填寫會員姓名和電話');
@@ -2960,7 +2993,7 @@
         
         function showSuccess(formData, imageData) {
             var details = '<p><strong>會員姓名：</strong>' + formData.memberName + '</p>' +
-                '<p><strong>檢測日期：</strong>' + formData.assessmentDate + '</p>' +
+                '<p><strong>檢測日期時間：</strong>' + formData.assessmentDate + ' ' + formData.assessmentTime + '</p>' +
                 '<p><strong>Moti 照片：</strong>' + (imageData.motiUrls.length || 0) + ' 張已上傳</p>' +
                 '<p><strong>InBody 照片：</strong>' + (imageData.inbodyUrl ? '1 張已上傳' : '無') + '</p>';
             
@@ -3078,7 +3111,21 @@
                 h.style.left = spot.x + '%';
                 h.style.top = spot.y + '%';
                 h.dataset.group = spot.group;
+                h.dataset.label = spot.label;
                 h.innerHTML = '<div class="hotspot-tooltip">' + spot.label + '</div>';
+                
+                // 點擊熱點自動填入肌肉名稱
+                h.addEventListener('click', function() {
+                    if (lastMuscleInput && lastMuscleInput.value === '') {
+                        lastMuscleInput.value = spot.label;
+                        showToast('已填入：' + spot.label);
+                    } else if (!lastMuscleInput) {
+                        showToast('請先點擊「+ 新增肌肉」按鈕');
+                    } else {
+                        showToast('目前輸入框已有內容，請新增肌肉或清空');
+                    }
+                });
+                
                 overlay.appendChild(h);
             });
         }
@@ -3121,8 +3168,12 @@
             entry.className = 'muscle-entry';
             entry.id = entryId;
             var sidesHtml = sides.map(function(s) { return '<label class="radio-btn"><input type="radio" name="' + entryId + '_side" value="' + s + '"><span class="circle"></span><span>' + s + '</span></label>'; }).join('');
-            entry.innerHTML = '<div class="muscle-entry-header"><input type="text" class="muscle-name-input" placeholder="輸入肌肉名稱"><button class="remove-entry-btn" onclick="removeMuscleEntry(\''+entryId+'\', \''+containerId+'\')">×</button></div><div class="muscle-option-row"><span class="muscle-option-label">狀態</span><div class="radio-group"><label class="radio-btn"><input type="radio" name="'+entryId+'_status" value="緊繃"><span class="circle"></span><span>緊繃</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_status" value="無力"><span class="circle"></span><span>無力</span></label></div></div><div class="muscle-option-row"><span class="muscle-option-label">側邊</span><div class="radio-group">' + sidesHtml + '</div></div><div class="muscle-option-row"><span class="muscle-option-label">等級</span><div class="radio-group"><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="6"><span class="circle"></span><span>6</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="7"><span class="circle"></span><span>7</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="8"><span class="circle"></span><span>8</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="9"><span class="circle"></span><span>9</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="10"><span class="circle"></span><span>10</span></label></div><span style="color: #999; font-size: 0.7rem; margin-left: 4px;">(moti)</span></div><div class="muscle-option-row"><span class="muscle-option-label">建議</span><div class="radio-group"><label class="radio-btn"><input type="radio" name="'+entryId+'_suggest" value="訓練"><span class="circle"></span><span>訓練</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_suggest" value="放鬆"><span class="circle"></span><span>放鬆</span></label></div><input type="text" class="suggest-note-input" placeholder="備註說明" id="'+entryId+'_note"></div>';
+            entry.innerHTML = '<div class="muscle-entry-header"><input type="text" class="muscle-name-input" placeholder="點擊圖片或手動輸入肌肉名稱"><button class="remove-entry-btn" onclick="removeMuscleEntry(\''+entryId+'\', \''+containerId+'\')">×</button></div><div class="muscle-option-row"><span class="muscle-option-label">狀態</span><div class="radio-group"><label class="radio-btn"><input type="radio" name="'+entryId+'_status" value="緊繃"><span class="circle"></span><span>緊繃</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_status" value="無力"><span class="circle"></span><span>無力</span></label></div></div><div class="muscle-option-row"><span class="muscle-option-label">側邊</span><div class="radio-group">' + sidesHtml + '</div></div><div class="muscle-option-row"><span class="muscle-option-label">等級</span><div class="radio-group"><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="6"><span class="circle"></span><span>6</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="7"><span class="circle"></span><span>7</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="8"><span class="circle"></span><span>8</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="9"><span class="circle"></span><span>9</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_level" value="10"><span class="circle"></span><span>10</span></label></div><span style="color: #999; font-size: 0.7rem; margin-left: 4px;">(moti)</span></div><div class="muscle-option-row"><span class="muscle-option-label">建議</span><div class="radio-group"><label class="radio-btn"><input type="radio" name="'+entryId+'_suggest" value="訓練"><span class="circle"></span><span>訓練</span></label><label class="radio-btn"><input type="radio" name="'+entryId+'_suggest" value="放鬆"><span class="circle"></span><span>放鬆</span></label></div><input type="text" class="suggest-note-input" placeholder="備註說明" id="'+entryId+'_note"></div>';
             container.appendChild(entry);
+            
+            // 追蹤最近新增的輸入框
+            lastMuscleInput = entry.querySelector('.muscle-name-input');
+            lastMuscleInput.focus();
         }
         
         function removeMuscleEntry(entryId, containerId) {
@@ -3131,6 +3182,14 @@
             if (!container.querySelector('.muscle-entry')) {
                 container.innerHTML = '<div class="empty-muscle-hint">尚未新增肌肉，請點擊下方按鈕新增</div>';
             }
+        }
+
+        // ==================== 堂數計算 ====================
+        function updateTotalCourses() {
+            var weight = parseInt(document.getElementById('weightTraining').value) || 0;
+            var pilates = parseInt(document.getElementById('pilatesTraining').value) || 0;
+            var stretch = parseInt(document.getElementById('stretchTraining').value) || 0;
+            document.getElementById('totalCourses').value = weight + pilates + stretch;
         }
 
         // ==================== 教練評分 ====================
