@@ -2776,6 +2776,9 @@
                 // 肌肉張力（文字格式，給 Google Sheet 用）
                 muscleText: formatMuscleText(),
                 
+                // 肌肉張力（LINE 訊息用）
+                muscleTextForLine: formatMuscleTextForLine(),
+                
                 // 分析師建議
                 suggestions: {
                     shortTermGoal: document.getElementById('shortTermGoal').value,
@@ -2821,9 +2824,35 @@
             return diseases;
         }
         
+        // 原本的格式（給 Google Sheet 用）
         function formatMuscleText() {
             var muscles = collectMuscleData();
             var result = {};
+            
+            Object.keys(muscles).forEach(function(group) {
+                var entries = muscles[group];
+                if (entries.length === 0) {
+                    result[group] = '';
+                } else {
+                    result[group] = entries.map(function(m, index) {
+                        var lines = [];
+                        lines.push('【' + (index + 1) + '】' + (m.name || '未命名'));
+                        if (m.status) lines.push('狀態：' + m.status);
+                        if (m.side) lines.push('側邊：' + m.side);
+                        if (m.level) lines.push('等級：' + m.level);
+                        if (m.suggest) lines.push('建議：' + m.suggest);
+                        if (m.note) lines.push('備註：' + m.note);
+                        return lines.join('｜');
+                    }).join('\n');
+                }
+            });
+            
+            return result;
+        }
+        
+        // LINE 訊息用的格式（整合版）
+        function formatMuscleTextForLine() {
+            var muscles = collectMuscleData();
             var groupNames = {
                 shoulder: '肩膀肌群',
                 chest: '胸部肌群',
@@ -2833,12 +2862,14 @@
                 leg: '腿部肌群'
             };
             
+            var result = {};
+            
+            // 每個肌群獨立輸出
             Object.keys(muscles).forEach(function(group) {
                 var entries = muscles[group];
                 if (entries.length === 0) {
                     result[group] = '';
                 } else {
-                    // 格式：左三頭肌：緊繃 左側 7級 放鬆 備註：xxx
                     result[group] = entries.map(function(m) {
                         var parts = [m.name || '未命名'];
                         if (m.status) parts.push(m.status);
@@ -2851,7 +2882,7 @@
                 }
             });
             
-            // 產生完整的 LINE 訊息格式
+            // 完整的 LINE 訊息格式
             var lineText = [];
             Object.keys(muscles).forEach(function(group) {
                 if (result[group]) {
