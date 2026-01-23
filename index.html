@@ -1940,21 +1940,27 @@
             initDragDrop();
             updateSkeletonStep();
             updateMuscleStep();
-            loadCoaches(); // 載入教練名單
-            initLiff(); // 初始化 LIFF
+            
+            // 先初始化 LIFF 登入，登入成功後才載入教練名單
+            initLiff();
         });
         
         // ==================== LIFF 初始化 ====================
         async function initLiff() {
+            console.log('initLiff 開始執行');
             try {
+                console.log('LIFF ID:', CONFIG.LIFF_ID);
                 await liff.init({ liffId: CONFIG.LIFF_ID });
+                console.log('LIFF 初始化成功');
                 
                 if (!liff.isLoggedIn()) {
+                    console.log('用戶未登入，導向 LINE 登入');
                     // 未登入，導向 LINE 登入
                     liff.login({ redirectUri: window.location.href });
                     return;
                 }
                 
+                console.log('用戶已登入，取得資料中...');
                 // 已登入，取得用戶資料
                 var profile = await liff.getProfile();
                 var lineUserId = profile.userId;
@@ -1965,7 +1971,12 @@
                 document.getElementById('analystLineId').value = lineUserId;
                 
                 // 查詢分析師資料
+                console.log('開始查詢分析師...');
                 await loadAnalyst(lineUserId);
+                
+                // 登入成功後載入教練名單
+                console.log('開始載入教練名單...');
+                await loadCoaches();
                 
             } catch (error) {
                 console.error('LIFF init error:', error);
@@ -1976,6 +1987,7 @@
         
         // 查詢分析師（從教練表）
         async function loadAnalyst(lineUserId) {
+            console.log('loadAnalyst 開始執行，lineUserId:', lineUserId);
             try {
                 var response = await fetch(CONFIG.MAKE_WEBHOOK_URL, {
                     method: 'POST',
@@ -1987,11 +1999,13 @@
                 });
                 
                 var result = await response.json();
+                console.log('get_analyst 結果:', result);
                 
                 if (result.success && result.analyst) {
                     analystData = result.analyst;
                     document.getElementById('analystName').textContent = result.analyst.name;
                     document.getElementById('analystGroup').style.display = 'block';
+                    console.log('分析師載入成功:', result.analyst.name);
                 } else {
                     // 找不到分析師，隱藏欄位
                     document.getElementById('analystGroup').style.display = 'none';
