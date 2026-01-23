@@ -101,6 +101,24 @@
             margin-bottom: 20px; padding-bottom: 12px;
             border-bottom: 2px solid var(--green-light);
         }
+        .analyst-info {
+            background: linear-gradient(135deg, var(--green-light) 0%, var(--blue-light) 100%);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .analyst-label {
+            color: var(--green-dark);
+            font-weight: 500;
+        }
+        .analyst-name {
+            color: var(--green-dark);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
 
         .form-group { margin-bottom: 18px; }
         .form-label { display: block; font-weight: 500; color: #555; margin-bottom: 8px; }
@@ -114,24 +132,6 @@
         .form-input:focus {
             outline: none; border-color: var(--green);
             box-shadow: 0 0 0 3px rgba(122, 193, 154, 0.2);
-        }
-        .analyst-display {
-            padding: 12px 16px;
-            background: linear-gradient(135deg, var(--green-light) 0%, var(--blue-light) 100%);
-            border: 2px solid var(--green);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .analyst-name {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--green-dark);
-        }
-        .analyst-display::before {
-            content: '👤';
-            font-size: 1.2rem;
         }
 
         .btn {
@@ -1245,6 +1245,10 @@
         <div class="main-content active" id="page1">
             <div class="card">
                 <h2 class="card-title">📋 會員資料</h2>
+                <div class="analyst-info" id="analystInfo" style="display:none;">
+                    <span class="analyst-label">🧑‍⚕️ 分析師：</span>
+                    <span class="analyst-name" id="analystName">-</span>
+                </div>
                 <div class="search-row">
                     <div class="form-group"><label class="form-label">姓名 *</label><input type="text" class="form-input" id="memberName" placeholder="請輸入會員姓名"></div>
                     <div class="form-group"><label class="form-label">電話 *</label><input type="tel" class="form-input" id="memberPhone" placeholder="請輸入聯絡電話"></div>
@@ -1252,13 +1256,6 @@
                 </div>
                 <div id="memberSearchResult"></div>
                 <div class="form-group" style="margin-top: 15px;"><label class="form-label">檢測日期</label><input type="date" class="form-input" id="assessmentDate"></div>
-                <div class="form-group" id="analystGroup" style="display: none;">
-                    <label class="form-label">分析師</label>
-                    <div class="analyst-display" id="analystDisplay">
-                        <span class="analyst-name" id="analystName">載入中...</span>
-                        <input type="hidden" id="analystLineId" value="">
-                    </div>
-                </div>
             </div>
             <div class="nav-buttons"><div></div><button class="btn btn-primary" onclick="nextPage()">下一步 →</button></div>
         </div>
@@ -1763,7 +1760,7 @@
     <script>
         // ==================== 設定區（請填入） ====================
         var CONFIG = {
-            // 【請填入】LIFF ID（從 LINE Developers Console 取得）
+            // 【請填入】LIFF ID
             LIFF_ID: '2008660081-Pw8Zcb6h',
             
             // 【請填入】Make Webhook URL（查詢會員 + 提交評估）
@@ -1773,7 +1770,7 @@
             IMAGEKIT_AUTH_URL: 'https://script.google.com/macros/s/AKfycbyoVmFxHHtH8xnHlvUVrADYOepAywFyTLh9GSql8LMiahIdgxNMedrI0elfT1yDr2Fw/exec',
             
             // 【請填入】ImageKit Public Key
-            IMAGEKIT_PUBLIC_KEY: 'public_tS8YfdCMhUonkM8VMZ+cCg71SHw',
+            IMAGEKIT_PUBLIC_KEY: 'public_tS8YfdCMhUonkM8VMZ+cCg71SHw=',
             
             // 【請填入】ImageKit URL Endpoint
             IMAGEKIT_URL_ENDPOINT: 'https://ik.imagekit.io/hanhealth/',
@@ -1796,6 +1793,8 @@
         var inbodyFiles = [];
         var memberData = null;
         var historyData = [];
+        var analystData = null;  // 分析師資料
+        var lineUserId = null;   // LINE User ID
         var currentPage = 1, currentSkeletonStep = 0, currentMuscleStepIndex = 0, muscleEntryCounter = 0;
 
         // 熱點座標
@@ -1906,9 +1905,6 @@
         ];
 
         var muscleGroups = ['shoulder', 'chest', 'back', 'core', 'glute', 'leg'];
-        
-        // 分析師資料
-        var analystData = null;
 
         // ==================== 初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -1918,48 +1914,64 @@
             updateSkeletonStep();
             updateMuscleStep();
             loadCoaches(); // 載入教練名單
-            initLiff(); // 初始化 LIFF
+            initLiff();    // 初始化 LIFF
         });
-        
+
         // ==================== LIFF 初始化 ====================
         async function initLiff() {
             try {
+                // 先檢查 URL 參數是否有 lineId
+                var urlParams = new URLSearchParams(window.location.search);
+                var paramLineId = urlParams.get('lineId') || urlParams.get('lineid') || urlParams.get('line_id');
+                
+                if (paramLineId) {
+                    // 用 URL 參數的 LINE ID
+                    lineUserId = paramLineId;
+                    console.log('從 URL 參數取得 LINE ID:', lineUserId);
+                    await fetchAnalystByLineId(lineUserId);
+                    return;
+                }
+                
+                // 初始化 LIFF
                 await liff.init({ liffId: CONFIG.LIFF_ID });
+                console.log('LIFF 初始化成功');
                 
                 if (!liff.isLoggedIn()) {
-                    // 未登入，導向 LINE 登入
-                    liff.login({ redirectUri: window.location.href });
+                    // 未登入，導向登入
+                    console.log('未登入，導向 LINE 登入...');
+                    liff.login();
                     return;
                 }
                 
                 // 已登入，取得用戶資料
                 var profile = await liff.getProfile();
-                var lineUserId = profile.userId;
-                
+                lineUserId = profile.userId;
                 console.log('LINE User ID:', lineUserId);
                 
-                // 儲存到隱藏欄位
-                document.getElementById('analystLineId').value = lineUserId;
-                
-                // 查詢分析師資料
-                await loadAnalyst(lineUserId);
+                // 用 LINE ID 查詢分析師資料
+                await fetchAnalystByLineId(lineUserId);
                 
             } catch (error) {
-                console.error('LIFF init error:', error);
-                // LIFF 初始化失敗，隱藏分析師欄位
-                document.getElementById('analystGroup').style.display = 'none';
+                console.error('LIFF 初始化錯誤:', error);
+                // LIFF 失敗時，檢查 URL 參數
+                var urlParams = new URLSearchParams(window.location.search);
+                var paramLineId = urlParams.get('lineId') || urlParams.get('lineid') || urlParams.get('line_id');
+                if (paramLineId) {
+                    lineUserId = paramLineId;
+                    await fetchAnalystByLineId(lineUserId);
+                }
             }
         }
         
-        // 查詢分析師（從教練表）
-        async function loadAnalyst(lineUserId) {
+        // 用 LINE ID 查詢分析師
+        async function fetchAnalystByLineId(lineId) {
             try {
                 var response = await fetch(CONFIG.MAKE_WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         action: 'get_analyst',
-                        lineUserId: lineUserId
+                        lineId: lineId
                     })
                 });
                 
@@ -1967,16 +1979,14 @@
                 
                 if (result.success && result.analyst) {
                     analystData = result.analyst;
-                    document.getElementById('analystName').textContent = result.analyst.name;
-                    document.getElementById('analystGroup').style.display = 'block';
+                    document.getElementById('analystName').textContent = analystData.coach_name;
+                    document.getElementById('analystInfo').style.display = 'flex';
+                    console.log('分析師資料:', analystData);
                 } else {
-                    // 找不到分析師，隱藏欄位
-                    document.getElementById('analystGroup').style.display = 'none';
-                    console.log('找不到對應的分析師');
+                    console.log('查無此分析師');
                 }
             } catch (error) {
-                console.error('Load analyst error:', error);
-                document.getElementById('analystGroup').style.display = 'none';
+                console.error('查詢分析師錯誤:', error);
             }
         }
 
@@ -2645,8 +2655,8 @@
                 
                 // 分析師資料
                 analystId: analystData ? analystData.id : '',
-                analystName: analystData ? analystData.name : '',
-                analystLineId: document.getElementById('analystLineId').value,
+                analystName: analystData ? analystData.coach_name : '',
+                analystLineId: lineUserId || '',
                 
                 // 個人資料
                 goals: Array.from(document.querySelectorAll('input[name="goals"]:checked')).map(function(el) { return el.value; }),
