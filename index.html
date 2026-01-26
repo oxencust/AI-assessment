@@ -1697,6 +1697,7 @@
                 </div>
                 <div class="form-group"><label class="form-label">注意事項</label><textarea class="form-input" id="precautions" rows="2" placeholder="請填寫注意事項"></textarea></div>
                 <div class="form-group"><label class="form-label">客服協助</label><textarea class="form-input" id="serviceNotes" rows="2" placeholder="請填寫需要客服協助的事項"></textarea></div>
+                <div class="form-group"><label class="form-label">Inbody 檢測結果</label><textarea class="form-input" id="inbodyResult" rows="2" placeholder="請填寫 Inbody 檢測結果摘要（如：肌肉、蛋白質不足）"></textarea></div>
             </div>
 
             <!-- 圖片上傳區 -->
@@ -1888,7 +1889,7 @@
             { id: 'iliopsoas-left', x: 32.8, y: 46.5, label: '左髂腰肌', group: 'core' },
             { id: 'iliopsoas-right', x: 24.2, y: 46.5, label: '右髂腰肌', group: 'core' },
             { id: 'tfl-left', x: 36.8, y: 50.5, label: '左闊筋膜張肌', group: 'glute' },
-            { id: 'tfl-right', x: 20.6, y: 50.5, label: '右闊筋膜張肌', group: 'glute' },
+            { id: 'tfl-right', x: 20.6, y: 50.5, label: '右闘筋膜張肌', group: 'glute' },
             { id: 'quad-left', x: 34.0, y: 60.7, label: '左股四頭肌', group: 'leg' },
             { id: 'quad-right', x: 23.2, y: 60.7, label: '右股四頭肌', group: 'leg' },
             { id: 'adductor-left', x: 30.8, y: 56.1, label: '左內收肌群', group: 'leg' },
@@ -1902,8 +1903,8 @@
             { id: 'lower-trap', x: 70.4, y: 29.1, label: '下斜方肌', group: 'back' },
             { id: 'rhomboid-left', x: 68.0, y: 27.5, label: '左菱形肌', group: 'back' },
             { id: 'rhomboid-right', x: 77.6, y: 27.5, label: '右菱形肌', group: 'back' },
-            { id: 'lat-left', x: 67.4, y: 33.3, label: '左闊背肌', group: 'back' },
-            { id: 'lat-right', x: 77.8, y: 33.3, label: '右闊背肌', group: 'back' },
+            { id: 'lat-left', x: 67.4, y: 33.3, label: '左闘背肌', group: 'back' },
+            { id: 'lat-right', x: 77.8, y: 33.3, label: '右闘背肌', group: 'back' },
             { id: 'erector-spinae', x: 72.6, y: 35.9, label: '豎脊肌', group: 'back' },
             { id: 'glute-med-left', x: 67.2, y: 45.1, label: '左臀中肌', group: 'glute' },
             { id: 'glute-med-right', x: 77.4, y: 45.1, label: '右臀中肌', group: 'glute' },
@@ -2040,13 +2041,13 @@
         }
         
         function renderCoaches(coaches) {
-            var weightCoaches = coaches.filter(function(c) { return c.coach_type === 'weight'; });
+            var weightCoaches = coaches.filter(function(c) { return c.coach_type === 'strength_training'; });
             var pilatesCoaches = coaches.filter(function(c) { return c.coach_type === 'pilates'; });
-            var stretchCoaches = coaches.filter(function(c) { return c.coach_type === 'stretch'; });
+            var stretchCoaches = coaches.filter(function(c) { return c.coach_type === 'stretching'; });
             
-            renderCoachGrid('weightCoaches', weightCoaches, 'weight');
+            renderCoachGrid('weightCoaches', weightCoaches, 'strength_training');
             renderCoachGrid('pilatesCoaches', pilatesCoaches, 'pilates');
-            renderCoachGrid('stretchCoaches', stretchCoaches, 'stretch');
+            renderCoachGrid('stretchCoaches', stretchCoaches, 'stretching');
             
             // 初始化評分功能
             initHalfStarRatings();
@@ -2791,11 +2792,12 @@
                     fasciaRelease: document.getElementById('fasciaRelease').value,
                     coachRatings: collectCoachRatings(),
                     // 教練推薦（文字格式，給 Google Sheet 用）
-                    weightCoachText: formatCoachText('weight'),
+                    weightCoachText: formatCoachText('strength_training'),
                     pilatesCoachText: formatCoachText('pilates'),
-                    stretchCoachText: formatCoachText('stretch'),
+                    stretchCoachText: formatCoachText('stretching'),
                     precautions: document.getElementById('precautions').value,
-                    serviceNotes: document.getElementById('serviceNotes').value
+                    serviceNotes: document.getElementById('serviceNotes').value,
+                    inbodyResult: document.getElementById('inbodyResult').value
                 }
             };
             
@@ -2922,9 +2924,9 @@
 
         function collectCoachRatings() {
             var ratings = {
-                weight: [],
+                strength_training: [],
                 pilates: [],
-                stretch: []
+                stretching: []
             };
             
             document.querySelectorAll('.half-star-rating').forEach(function(el) {
@@ -2995,19 +2997,16 @@
                 return;
             }
             
-            // 驗證是否已查詢取得學生編號
-            if (!formData.memberId) {
-                showToast('請先點擊「查詢」取得學生編號');
-                return;
-            }
+            // 標記是否有匹配到會員資料
+            formData.isNewMember = !formData.memberId;
             
             showLoading('正在提交...');
             document.getElementById('submitBtn').disabled = true;
             
             try {
-                // 上傳圖片
-                var memberId = formData.memberId;
-                var imageData = await uploadAllImages(memberId, formData.memberName, formData.assessmentDate);
+                // 上傳圖片（如果沒有 memberId，用 "NEW_" + 電話 作為資料夾名稱）
+                var folderId = formData.memberId || ('NEW_' + formData.memberPhone);
+                var imageData = await uploadAllImages(folderId, formData.memberName, formData.assessmentDate);
                 
                 // 整合資料（相簿連結由後端產生）
                 formData.images = {
@@ -3281,4 +3280,3 @@
     </script>
 </body>
 </html>
-
