@@ -1789,7 +1789,7 @@
             ALBUM_BASE_URL: 'https://oxencust.github.io/moti-album/',
             
             // 【請填入】骨骼肌肉圖 URL（上傳到 ImageKit 後填入）
-            BODY_FRONT_URL: 'https://ik.imagekit.io/hanhealth/assets/body-front.png?updatedAt=1769149355576',
+            BODY_FRONT_URL: 'https://ik.imagekit.io/hanhealth/assets/body-front.png?updatedAt=1769149355576L',
             BODY_BACK_URL: 'https://ik.imagekit.io/hanhealth/assets/body-back.png?updatedAt=1769149354223',
             BODY_SIDE_URL: 'https://ik.imagekit.io/hanhealth/assets/body-side.png?updatedAt=1769149355797',
             
@@ -2136,7 +2136,7 @@
                 '</div>';
             
             // 儲存歷史資料到全域變數（從舊到新排序）
-            historyData = history.slice().reverse();
+            historyData = (history && history.length > 0) ? history.slice().reverse() : [];
             
             // 時間軸區塊
             html += '<div class="timeline-section">' +
@@ -2144,24 +2144,29 @@
                 '<div class="timeline-container">' +
                 '<div class="timeline-track">';
             
-            // 歷史紀錄節點
-            historyData.forEach(function(h, index) {
-                var dateStr = h.date || '';
-                var dateObj = new Date(dateStr.replace(/\//g, '-'));
-                var month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-                var day = dateObj.getDate().toString().padStart(2, '0');
-                var year = dateObj.getFullYear();
-                var hours = dateObj.getHours().toString().padStart(2, '0');
-                var minutes = dateObj.getMinutes().toString().padStart(2, '0');
-                var timeStr = hours + ':' + minutes;
-                
-                html += '<div class="timeline-node" data-index="' + index + '" onclick="showHistoryDetail(' + index + ')">' +
-                    '<div class="timeline-dot"></div>' +
-                    '<div class="timeline-date">' + month + '/' + day + '</div>' +
-                    '<div class="timeline-year">' + year + '</div>' +
-                    '<div class="timeline-time">' + timeStr + '</div>' +
-                    '</div>';
-            });
+            // 歷史紀錄節點（只有有資料時才顯示）
+            if (historyData.length > 0) {
+                historyData.forEach(function(h, index) {
+                    var dateStr = h.date || '';
+                    var dateObj = new Date(dateStr.replace(/\//g, '-'));
+                    
+                    // 檢查日期是否有效
+                    var isValidDate = !isNaN(dateObj.getTime());
+                    var month = isValidDate ? (dateObj.getMonth() + 1).toString().padStart(2, '0') : '--';
+                    var day = isValidDate ? dateObj.getDate().toString().padStart(2, '0') : '--';
+                    var year = isValidDate ? dateObj.getFullYear() : '----';
+                    var hours = isValidDate ? dateObj.getHours().toString().padStart(2, '0') : '--';
+                    var minutes = isValidDate ? dateObj.getMinutes().toString().padStart(2, '0') : '--';
+                    var timeStr = hours + ':' + minutes;
+                    
+                    html += '<div class="timeline-node" data-index="' + index + '" onclick="showHistoryDetail(' + index + ')">' +
+                        '<div class="timeline-dot"></div>' +
+                        '<div class="timeline-date">' + month + '/' + day + '</div>' +
+                        '<div class="timeline-year">' + year + '</div>' +
+                        '<div class="timeline-time">' + timeStr + '</div>' +
+                        '</div>';
+                });
+            }
             
             // 今天的節點（新增檢測）
             html += '<div class="timeline-node timeline-node-new">' +
