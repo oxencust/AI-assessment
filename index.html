@@ -592,6 +592,20 @@
             justify-content: center;
             margin: 0;
         }
+        .course-order-select {
+            margin-top: 6px;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background: #f9f9f9;
+            color: #333;
+            cursor: pointer;
+        }
+        .course-order-select:focus {
+            outline: none;
+            border-color: var(--green);
+        }
 
         .nav-buttons {
             display: flex; justify-content: space-between;
@@ -623,6 +637,160 @@
         }
         .success-overlay.active {
             display: flex;
+        }
+        
+        /* 補件按鈕 */
+        .detail-actions {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px dashed #ddd;
+            text-align: center;
+        }
+        .supplement-btn {
+            background: linear-gradient(135deg, var(--pink) 0%, var(--pink-dark) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .supplement-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(232, 180, 188, 0.4);
+        }
+        
+        /* 補件彈窗 */
+        .supplement-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+        .supplement-overlay.active {
+            display: flex;
+        }
+        .supplement-box {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s ease;
+        }
+        .supplement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--green-light);
+        }
+        .supplement-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--pink-dark);
+        }
+        .supplement-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        .supplement-info {
+            background: var(--green-light);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .supplement-upload-section {
+            margin-bottom: 20px;
+        }
+        .supplement-upload-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .supplement-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .supplement-upload-area:hover {
+            border-color: var(--pink);
+            background: var(--pink-light);
+        }
+        .supplement-upload-area input {
+            display: none;
+        }
+        .supplement-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .supplement-preview-item {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .supplement-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .supplement-preview-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            background: rgba(255,0,0,0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .supplement-submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .supplement-submit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(139, 195, 181, 0.4);
+        }
+        .supplement-submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
         .success-box {
             background: white;
@@ -1392,10 +1560,10 @@
                             <h3 style="margin-bottom: 10px; color: var(--pink-dark); font-size: 1rem;">頸椎評估（標準11度）</h3>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">頸椎狀態</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="cervical" value="前引"><span class="circle"></span><span>前引</span></label>
-                                    <label class="radio-btn"><input type="radio" name="cervical" value="後伸"><span class="circle"></span><span>後伸</span></label>
-                                    <label class="radio-btn"><input type="radio" name="cervical" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="cervical" value="前引"><span>前引</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="cervical" value="後伸"><span>後伸</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="cervical" value="正常"><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 8px;"><input type="number" id="cervicalDegree" placeholder="11"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="cervicalNote" placeholder="備註...">
@@ -1406,10 +1574,10 @@
                             <h3 style="margin-bottom: 10px; color: var(--pink-dark); font-size: 1rem;">胸椎評估（標準36度）</h3>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">胸椎狀態</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="thoracic" value="前凸"><span class="circle"></span><span>前凸</span></label>
-                                    <label class="radio-btn"><input type="radio" name="thoracic" value="後凸"><span class="circle"></span><span>後凸</span></label>
-                                    <label class="radio-btn"><input type="radio" name="thoracic" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="thoracic" value="前凸"><span>前凸</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="thoracic" value="後凸"><span>後凸</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="thoracic" value="正常"><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 8px;"><input type="number" id="thoracicDegree" placeholder="36"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="thoracicNote" placeholder="備註...">
@@ -1420,10 +1588,10 @@
                             <h3 style="margin-bottom: 10px; color: var(--pink-dark); font-size: 1rem;">腰椎評估（標準35度）</h3>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">腰椎狀態</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="lumbar" value="前凸"><span class="circle"></span><span>前凸</span></label>
-                                    <label class="radio-btn"><input type="radio" name="lumbar" value="後凸"><span class="circle"></span><span>後凸</span></label>
-                                    <label class="radio-btn"><input type="radio" name="lumbar" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="lumbar" value="前凸"><span>前凸</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="lumbar" value="後凸"><span>後凸</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="lumbar" value="正常"><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 8px;"><input type="number" id="lumbarDegree" placeholder="35"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="lumbarNote" placeholder="備註...">
@@ -1434,34 +1602,35 @@
                             <h3 style="margin-bottom: 10px; color: var(--pink-dark); font-size: 1rem;">骨盆評估</h3>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">1. 前後傾</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="pelvisTilt" value="前傾"><span class="circle"></span><span>前傾</span></label>
-                                    <label class="radio-btn"><input type="radio" name="pelvisTilt" value="後傾"><span class="circle"></span><span>後傾</span></label>
-                                    <label class="radio-btn"><input type="radio" name="pelvisTilt" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisTilt" value="前傾"><span>前傾</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisTilt" value="後傾"><span>後傾</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisTilt" value="正常"><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 6px;"><input type="number" id="pelvisTiltDegree" placeholder="0"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="pelvisTiltNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">2. 左右高低</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="pelvisSide" value="左側"><span class="circle"></span><span>左側</span></label>
-                                    <label class="radio-btn"><input type="radio" name="pelvisSide" value="右側"><span class="circle"></span><span>右側</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisSide" value="左側"><span>左側</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisSide" value="右側"><span>右側</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 6px;"><input type="number" id="pelvisSideDegree" placeholder="0"><span>度</span></div>
-                                <div class="radio-group" style="margin-top: 6px;">
-                                    <label class="radio-btn"><input type="radio" name="pelvisUpDown" value="上提"><span class="circle"></span><span>上提</span></label>
-                                    <label class="radio-btn"><input type="radio" name="pelvisUpDown" value="下降"><span class="circle"></span><span>下降</span></label>
+                                <div class="checkbox-group" style="margin-top: 6px;">
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisUpDown" value="上提"><span>上提</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisUpDown" value="下降"><span>下降</span></label>
                                 </div>
                                 <input type="text" class="item-note-input" id="pelvisSideNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">3. 旋轉</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="pelvisRotation" value="向左旋轉"><span class="circle"></span><span>向左旋轉</span></label>
-                                    <label class="radio-btn"><input type="radio" name="pelvisRotation" value="向右旋轉"><span class="circle"></span><span>向右旋轉</span></label>
-                                    <label class="radio-btn"><input type="radio" name="pelvisRotation" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisRotation" value="向左旋轉"><span>向左旋轉</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisRotation" value="向右旋轉"><span>向右旋轉</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="pelvisRotation" value="正常"><span>正常</span></label>
                                 </div>
+                                <div class="inline-form" style="margin-top: 6px;"><input type="number" id="pelvisRotationDegree" placeholder="0"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="pelvisRotationNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
@@ -1475,20 +1644,20 @@
                             <h3 style="margin-bottom: 10px; color: var(--pink-dark); font-size: 1rem;">膝蓋評估</h3>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">1. 左腳</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="leftKnee" value="內翻(X型)"><span class="circle"></span><span>內翻(X型)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="leftKnee" value="外翻(O型)"><span class="circle"></span><span>外翻(O型)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="leftKnee" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="leftKnee" value="內翻(X型)"><span>內翻(X型)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="leftKnee" value="外翻(O型)"><span>外翻(O型)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="leftKnee" value="正常"><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 6px;"><input type="number" id="leftKneeDegree" placeholder="0"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="leftKneeNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">2. 右腳</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="rightKnee" value="內翻(X型)"><span class="circle"></span><span>內翻(X型)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="rightKnee" value="外翻(O型)"><span class="circle"></span><span>外翻(O型)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="rightKnee" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="rightKnee" value="內翻(X型)"><span>內翻(X型)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="rightKnee" value="外翻(O型)"><span>外翻(O型)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="rightKnee" value="正常"><span>正常</span></label>
                                 </div>
                                 <div class="inline-form" style="margin-top: 6px;"><input type="number" id="rightKneeDegree" placeholder="0"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="rightKneeNote" placeholder="備註...">
@@ -1499,19 +1668,19 @@
                             <h3 style="margin-bottom: 10px; color: var(--pink-dark); font-size: 1rem;">腳踝評估</h3>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">1. 足弓狀態</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="arch" value="內翻(高足弓)"><span class="circle"></span><span>內翻(高足弓)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="arch" value="外翻(低足弓)"><span class="circle"></span><span>外翻(低足弓)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="arch" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="arch" value="內翻(高足弓)"><span>內翻(高足弓)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="arch" value="外翻(低足弓)"><span>外翻(低足弓)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="arch" value="正常"><span>正常</span></label>
                                 </div>
                                 <input type="text" class="item-note-input" id="archNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">2. 足部旋轉</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="footRotation" value="外旋(外八)"><span class="circle"></span><span>外旋(外八)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="footRotation" value="內旋(內八)"><span class="circle"></span><span>內旋(內八)</span></label>
-                                    <label class="radio-btn"><input type="radio" name="footRotation" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="footRotation" value="外旋(外八)"><span>外旋(外八)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="footRotation" value="內旋(內八)"><span>內旋(內八)</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="footRotation" value="正常"><span>正常</span></label>
                                 </div>
                                 <input type="text" class="item-note-input" id="footRotationNote" placeholder="備註...">
                             </div>
@@ -1533,24 +1702,25 @@
                                     <label class="radio-btn"><input type="radio" name="roundShoulder" value="是"><span class="circle"></span><span>是</span></label>
                                     <label class="radio-btn"><input type="radio" name="roundShoulder" value="否"><span class="circle"></span><span>否</span></label>
                                 </div>
+                                <div class="inline-form" style="margin-top: 6px;"><input type="number" id="roundShoulderDegree" placeholder="0"><span>度</span></div>
                                 <input type="text" class="item-note-input" id="roundShoulderNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">3. 肩胛骨</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="scapula" value="翼狀肩"><span class="circle"></span><span>翼狀肩</span></label>
-                                    <label class="radio-btn"><input type="radio" name="scapula" value="上迴旋異常"><span class="circle"></span><span>上迴旋異常</span></label>
-                                    <label class="radio-btn"><input type="radio" name="scapula" value="下迴旋異常"><span class="circle"></span><span>下迴旋異常</span></label>
-                                    <label class="radio-btn"><input type="radio" name="scapula" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="scapula" value="翼狀肩"><span>翼狀肩</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="scapula" value="功能異常"><span>功能異常</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="scapula" value="其他"><span>其他</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="scapula" value="正常"><span>正常</span></label>
                                 </div>
                                 <input type="text" class="item-note-input" id="scapulaNote" placeholder="備註...">
                             </div>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">4. 肱骨</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="humerus" value="前旋"><span class="circle"></span><span>前旋</span></label>
-                                    <label class="radio-btn"><input type="radio" name="humerus" value="內旋"><span class="circle"></span><span>內旋</span></label>
-                                    <label class="radio-btn"><input type="radio" name="humerus" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="humerus" value="前旋"><span>前旋</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="humerus" value="內旋"><span>內旋</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="humerus" value="正常"><span>正常</span></label>
                                 </div>
                                 <input type="text" class="item-note-input" id="humerusNote" placeholder="備註...">
                             </div>
@@ -1560,10 +1730,11 @@
                             <h3 style="margin-bottom: 10px; color: var(--pink-dark); font-size: 1rem;">關節功能 - 髖/膝/踝</h3>
                             <div class="assessment-row">
                                 <div class="assessment-row-title">髖關節</div>
-                                <div class="radio-group">
-                                    <label class="radio-btn"><input type="radio" name="hip" value="內旋"><span class="circle"></span><span>內旋</span></label>
-                                    <label class="radio-btn"><input type="radio" name="hip" value="外旋"><span class="circle"></span><span>外旋</span></label>
-                                    <label class="radio-btn"><input type="radio" name="hip" value="正常"><span class="circle"></span><span>正常</span></label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="hip" value="活動度"><span>活動度</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="hip" value="功能性"><span>功能性</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="hip" value="排列"><span>排列</span></label>
+                                    <label class="checkbox-label"><input type="checkbox" name="hip" value="正常"><span>正常</span></label>
                                 </div>
                                 <input type="text" class="item-note-input" id="hipNote" placeholder="備註...">
                             </div>
@@ -1624,7 +1795,7 @@
         <div class="main-content" id="page4">
             <div class="card">
                 <h2 class="card-title">💪 肌肉張力報告</h2>
-                <div class="hint-text">💡 左側為正面 | 右側為背面</div>
+                <div class="hint-text">💡 點擊圖片可快速輸入肌肉名稱</div>
                 <div class="two-column">
                     <div class="body-viewer">
                         <div class="body-image-wrapper" style="background: linear-gradient(135deg, var(--pink-light) 0%, var(--yellow-light) 100%);">
@@ -1665,10 +1836,11 @@
                     <div class="course-suggestion-box">
                         <div class="course-total-row"><label>總堂數</label><div class="inline-form" style="margin: 0;"><input type="number" id="totalCourses" placeholder="0" style="width: 80px;" readonly><span>堂</span></div></div>
                         <div class="course-detail-row">
-                            <div class="course-detail-item"><label>重訓</label><div class="inline-form"><input type="number" id="weightTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div></div>
-                            <div class="course-detail-item"><label>皮拉提斯</label><div class="inline-form"><input type="number" id="pilatesTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div></div>
-                            <div class="course-detail-item"><label>伸展</label><div class="inline-form"><input type="number" id="stretchTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div></div>
+                            <div class="course-detail-item"><label>重訓</label><div class="inline-form"><input type="number" id="weightTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div><select id="weightOrder" class="course-order-select"><option value="">順序</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                            <div class="course-detail-item"><label>皮拉提斯</label><div class="inline-form"><input type="number" id="pilatesTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div><select id="pilatesOrder" class="course-order-select"><option value="">順序</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                            <div class="course-detail-item"><label>伸展</label><div class="inline-form"><input type="number" id="stretchTraining" placeholder="0" oninput="updateTotalCourses()"><span>堂</span></div><select id="stretchOrder" class="course-order-select"><option value="">順序</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
                         </div>
+                        <div style="font-size: 0.75rem; color: #888; margin-top: 6px;">💡 順序：1=最優先上課，2=第二，3=第三</div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1764,6 +1936,45 @@
             <div class="success-details" id="successDetails"></div>
             <button class="btn btn-primary success-btn" onclick="closeSuccessAndReset()">完成，開始新評估</button>
             <button class="btn btn-secondary success-btn" onclick="closeSuccess()" style="margin-top: 10px;">關閉</button>
+        </div>
+    </div>
+    
+    <!-- 補件彈窗 -->
+    <div class="supplement-overlay" id="supplementOverlay">
+        <div class="supplement-box">
+            <div class="supplement-header">
+                <span class="supplement-title">📷 補上傳圖片</span>
+                <button class="supplement-close" onclick="closeSupplementModal()">×</button>
+            </div>
+            <div class="supplement-info" id="supplementInfo">
+                <!-- 顯示檢測資訊 -->
+            </div>
+            
+            <!-- Moti 照片補件 -->
+            <div class="supplement-upload-section">
+                <label class="supplement-upload-label">🤖 Moti AI 照片</label>
+                <div class="supplement-upload-area" onclick="document.getElementById('supplementMotiInput').click()">
+                    <div>📷 點擊選擇照片</div>
+                    <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">支援多選</div>
+                    <input type="file" id="supplementMotiInput" multiple accept="image/*" onchange="handleSupplementFile(event, 'moti')">
+                </div>
+                <div class="supplement-preview" id="supplementMotiPreview"></div>
+            </div>
+            
+            <!-- Inbody 照片補件 -->
+            <div class="supplement-upload-section">
+                <label class="supplement-upload-label">📊 InBody 照片</label>
+                <div class="supplement-upload-area" onclick="document.getElementById('supplementInbodyInput').click()">
+                    <div>📋 點擊選擇照片</div>
+                    <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">1 張</div>
+                    <input type="file" id="supplementInbodyInput" accept="image/*" onchange="handleSupplementFile(event, 'inbody')">
+                </div>
+                <div class="supplement-preview" id="supplementInbodyPreview"></div>
+            </div>
+            
+            <button class="supplement-submit-btn" id="supplementSubmitBtn" onclick="submitSupplement()" disabled>
+                上傳補件
+            </button>
         </div>
     </div>
 
@@ -1874,48 +2085,48 @@
 
         var muscleHotspots = [
             { id: 'front-neck', x: 27.2, y: 20.9, label: '胸鎖乳突肌', group: 'shoulder' },
-            { id: 'front-deltoid-left', x: 39.2, y: 24.3, label: '左三角肌', group: 'shoulder' },
-            { id: 'front-deltoid-right', x: 17.8, y: 24.3, label: '右三角肌', group: 'shoulder' },
-            { id: 'bicep-left', x: 40.2, y: 33.3, label: '左二頭肌', group: 'shoulder' },
-            { id: 'bicep-right', x: 18.4, y: 33.3, label: '右二頭肌', group: 'shoulder' },
-            { id: 'pec-major-left', x: 23.4, y: 26.7, label: '左胸大肌', group: 'chest' },
-            { id: 'pec-major-right', x: 33.2, y: 26.7, label: '右胸大肌', group: 'chest' },
-            { id: 'serratus-left', x: 35.2, y: 32.5, label: '左前鋸肌', group: 'chest' },
-            { id: 'serratus-right', x: 22.2, y: 32.5, label: '右前鋸肌', group: 'chest' },
+            { id: 'front-deltoid-left', x: 39.2, y: 24.3, label: '三角肌', group: 'shoulder' },
+            { id: 'front-deltoid-right', x: 17.8, y: 24.3, label: '三角肌', group: 'shoulder' },
+            { id: 'bicep-left', x: 40.2, y: 33.3, label: '二頭肌', group: 'shoulder' },
+            { id: 'bicep-right', x: 18.4, y: 33.3, label: '二頭肌', group: 'shoulder' },
+            { id: 'pec-major-left', x: 23.4, y: 26.7, label: '胸大肌', group: 'chest' },
+            { id: 'pec-major-right', x: 33.2, y: 26.7, label: '胸大肌', group: 'chest' },
+            { id: 'serratus-left', x: 35.2, y: 32.5, label: '前鋸肌', group: 'chest' },
+            { id: 'serratus-right', x: 22.2, y: 32.5, label: '前鋸肌', group: 'chest' },
             { id: 'rectus-upper', x: 28.6, y: 34.9, label: '上腹直肌', group: 'core' },
             { id: 'rectus-lower', x: 28.6, y: 43.3, label: '下腹直肌', group: 'core' },
-            { id: 'oblique-left', x: 34.2, y: 40.3, label: '左腹外斜肌', group: 'core' },
-            { id: 'oblique-right', x: 23.2, y: 40.3, label: '右腹外斜肌', group: 'core' },
-            { id: 'iliopsoas-left', x: 32.8, y: 46.5, label: '左髂腰肌', group: 'core' },
-            { id: 'iliopsoas-right', x: 24.2, y: 46.5, label: '右髂腰肌', group: 'core' },
-            { id: 'tfl-left', x: 36.8, y: 50.5, label: '左闊筋膜張肌', group: 'glute' },
-            { id: 'tfl-right', x: 20.6, y: 50.5, label: '右闘筋膜張肌', group: 'glute' },
-            { id: 'quad-left', x: 34.0, y: 60.7, label: '左股四頭肌', group: 'leg' },
-            { id: 'quad-right', x: 23.2, y: 60.7, label: '右股四頭肌', group: 'leg' },
-            { id: 'adductor-left', x: 30.8, y: 56.1, label: '左內收肌群', group: 'leg' },
-            { id: 'adductor-right', x: 26.2, y: 56.1, label: '右內收肌群', group: 'leg' },
-            { id: 'tibialis-left', x: 33.0, y: 77.1, label: '左脛前肌', group: 'leg' },
-            { id: 'tibialis-right', x: 23.6, y: 77.1, label: '右脛前肌', group: 'leg' },
-            { id: 'tricep-left', x: 61.6, y: 31.5, label: '左三頭肌', group: 'shoulder' },
-            { id: 'tricep-right', x: 84.0, y: 31.5, label: '右三頭肌', group: 'shoulder' },
+            { id: 'oblique-left', x: 34.2, y: 40.3, label: '腹外斜肌', group: 'core' },
+            { id: 'oblique-right', x: 23.2, y: 40.3, label: '腹外斜肌', group: 'core' },
+            { id: 'iliopsoas-left', x: 32.8, y: 46.5, label: '髂腰肌', group: 'core' },
+            { id: 'iliopsoas-right', x: 24.2, y: 46.5, label: '髂腰肌', group: 'core' },
+            { id: 'tfl-left', x: 36.8, y: 50.5, label: '闊筋膜張肌', group: 'glute' },
+            { id: 'tfl-right', x: 20.6, y: 50.5, label: '闊筋膜張肌', group: 'glute' },
+            { id: 'quad-left', x: 34.0, y: 60.7, label: '股四頭肌', group: 'leg' },
+            { id: 'quad-right', x: 23.2, y: 60.7, label: '股四頭肌', group: 'leg' },
+            { id: 'adductor-left', x: 30.8, y: 56.1, label: '內收肌群', group: 'leg' },
+            { id: 'adductor-right', x: 26.2, y: 56.1, label: '內收肌群', group: 'leg' },
+            { id: 'tibialis-left', x: 33.0, y: 77.1, label: '脛前肌', group: 'leg' },
+            { id: 'tibialis-right', x: 23.6, y: 77.1, label: '脛前肌', group: 'leg' },
+            { id: 'tricep-left', x: 61.6, y: 31.5, label: '三頭肌', group: 'shoulder' },
+            { id: 'tricep-right', x: 84.0, y: 31.5, label: '三頭肌', group: 'shoulder' },
             { id: 'upper-trap', x: 76.0, y: 21.1, label: '上斜方肌', group: 'back' },
             { id: 'mid-trap', x: 71.0, y: 25.1, label: '中斜方肌', group: 'back' },
             { id: 'lower-trap', x: 70.4, y: 29.1, label: '下斜方肌', group: 'back' },
-            { id: 'rhomboid-left', x: 68.0, y: 27.5, label: '左菱形肌', group: 'back' },
-            { id: 'rhomboid-right', x: 77.6, y: 27.5, label: '右菱形肌', group: 'back' },
-            { id: 'lat-left', x: 67.4, y: 33.3, label: '左闘背肌', group: 'back' },
-            { id: 'lat-right', x: 77.8, y: 33.3, label: '右闘背肌', group: 'back' },
+            { id: 'rhomboid-left', x: 68.0, y: 27.5, label: '菱形肌', group: 'back' },
+            { id: 'rhomboid-right', x: 77.6, y: 27.5, label: '菱形肌', group: 'back' },
+            { id: 'lat-left', x: 67.4, y: 33.3, label: '闊背肌', group: 'back' },
+            { id: 'lat-right', x: 77.8, y: 33.3, label: '闊背肌', group: 'back' },
             { id: 'erector-spinae', x: 72.6, y: 35.9, label: '豎脊肌', group: 'back' },
-            { id: 'glute-med-left', x: 67.2, y: 45.1, label: '左臀中肌', group: 'glute' },
-            { id: 'glute-med-right', x: 77.4, y: 45.1, label: '右臀中肌', group: 'glute' },
-            { id: 'glute-max-left', x: 68.8, y: 50.5, label: '左臀大肌', group: 'glute' },
-            { id: 'glute-max-right', x: 75.8, y: 50.5, label: '右臀大肌', group: 'glute' },
-            { id: 'hamstring-left', x: 67.8, y: 60.3, label: '左腿後肌群', group: 'leg' },
-            { id: 'hamstring-right', x: 77.4, y: 60.3, label: '右腿後肌群', group: 'leg' },
-            { id: 'gastrocnemius-left', x: 68.6, y: 76.5, label: '左腓腸肌', group: 'leg' },
-            { id: 'gastrocnemius-right', x: 76.8, y: 76.5, label: '右腓腸肌', group: 'leg' },
-            { id: 'soleus-left', x: 68.6, y: 84.5, label: '左比目魚肌', group: 'leg' },
-            { id: 'soleus-right', x: 76.6, y: 84.5, label: '右比目魚肌', group: 'leg' }
+            { id: 'glute-med-left', x: 67.2, y: 45.1, label: '臀中肌', group: 'glute' },
+            { id: 'glute-med-right', x: 77.4, y: 45.1, label: '臀中肌', group: 'glute' },
+            { id: 'glute-max-left', x: 68.8, y: 50.5, label: '臀大肌', group: 'glute' },
+            { id: 'glute-max-right', x: 75.8, y: 50.5, label: '臀大肌', group: 'glute' },
+            { id: 'hamstring-left', x: 67.8, y: 60.3, label: '腿後肌群', group: 'leg' },
+            { id: 'hamstring-right', x: 77.4, y: 60.3, label: '腿後肌群', group: 'leg' },
+            { id: 'gastrocnemius-left', x: 68.6, y: 76.5, label: '腓腸肌', group: 'leg' },
+            { id: 'gastrocnemius-right', x: 76.8, y: 76.5, label: '腓腸肌', group: 'leg' },
+            { id: 'soleus-left', x: 68.6, y: 84.5, label: '比目魚肌', group: 'leg' },
+            { id: 'soleus-right', x: 76.6, y: 84.5, label: '比目魚肌', group: 'leg' }
         ];
 
         var muscleGroups = ['shoulder', 'chest', 'back', 'core', 'glute', 'leg'];
@@ -2117,7 +2328,9 @@
                     var latestHistory = history.length > 0 ? history[0] : null;
                     fillPersonalData(result.member, latestHistory);
                 } else {
-                    showMemberError('查無此會員，請確認姓名和電話是否正確，或先至系統建檔');
+                    // 查無會員，但允許繼續填寫（作為新會員）
+                    memberData = null;
+                    showNewMemberNotice(name, phone);
                 }
             } catch (error) {
                 hideLoading();
@@ -2378,6 +2591,12 @@
                     '</div>';
             }
             
+            // 補件按鈕
+            html += '<div class="detail-actions">' +
+                '<button class="supplement-btn" onclick="openSupplementModal(' + index + ')">' +
+                '📷 補上傳圖片</button>' +
+                '</div>';
+            
             html += '</div></div>';
             
             document.getElementById('timelineDetail').innerHTML = html;
@@ -2456,6 +2675,34 @@
         function showMemberError(msg) {
             document.getElementById('memberSearchResult').innerHTML = '<div class="search-error">' + msg + '</div>';
             memberData = null;
+        }
+        
+        function showNewMemberNotice(name, phone) {
+            var html = '<div class="member-result new-member">' +
+                '<div class="member-result-title" style="background: linear-gradient(135deg, var(--yellow-dark), var(--yellow)); color: #333;">⚠️ 查無此會員</div>' +
+                '<div class="member-info-grid">' +
+                '<div class="member-info-item"><span class="member-info-label">姓名</span><span class="member-info-value">' + name + '</span></div>' +
+                '<div class="member-info-item"><span class="member-info-label">電話</span><span class="member-info-value">' + phone + '</span></div>' +
+                '</div>' +
+                '<div class="new-member-notice" style="background: var(--yellow-light); padding: 12px; border-radius: 8px; margin-top: 12px; text-align: center;">' +
+                '<p style="margin: 0; color: var(--yellow-dark);">📝 您可以繼續填寫檢測資料</p>' +
+                '<p style="margin: 4px 0 0; font-size: 0.85rem; color: #666;">資料將存入「查無學員的回報資料」表單</p>' +
+                '</div>' +
+                '<div class="timeline-section" style="margin-top: 15px;">' +
+                '<div class="timeline-title">📋 檢測歷程</div>' +
+                '<div class="timeline-container">' +
+                '<div class="timeline-track">' +
+                '<div class="timeline-node timeline-node-new">' +
+                '<div class="timeline-dot new"></div>' +
+                '<div class="timeline-date">今天</div>' +
+                '<div class="timeline-year">新增</div>' +
+                '</div>' +
+                '</div></div>' +
+                '<div class="first-time-badge">🎉 首次檢測，開始建立體態紀錄吧！</div>' +
+                '</div>' +
+                '</div>';
+            
+            document.getElementById('memberSearchResult').innerHTML = html;
         }
 
         // ==================== 圖片上傳 ====================
@@ -2716,37 +2963,39 @@
                     lumbarCurveDegree: document.getElementById('lumbarCurveDegree').value,
                     lumbarCurveDirection: document.querySelector('input[name="lumbarCurve"]:checked')?.value || '',
                     // 步驟2 頸椎
-                    cervicalStatus: document.querySelector('input[name="cervical"]:checked')?.value || '',
+                    cervicalStatus: Array.from(document.querySelectorAll('input[name="cervical"]:checked')).map(function(el) { return el.value; }),
                     cervicalDegree: document.getElementById('cervicalDegree').value,
                     // 步驟3 胸椎
-                    thoracicStatus: document.querySelector('input[name="thoracic"]:checked')?.value || '',
+                    thoracicStatus: Array.from(document.querySelectorAll('input[name="thoracic"]:checked')).map(function(el) { return el.value; }),
                     thoracicDegree: document.getElementById('thoracicDegree').value,
                     // 步驟4 腰椎
-                    lumbarStatus: document.querySelector('input[name="lumbar"]:checked')?.value || '',
+                    lumbarStatus: Array.from(document.querySelectorAll('input[name="lumbar"]:checked')).map(function(el) { return el.value; }),
                     lumbarDegree: document.getElementById('lumbarDegree').value,
                     // 步驟5 骨盆
-                    pelvisTilt: document.querySelector('input[name="pelvisTilt"]:checked')?.value || '',
+                    pelvisTilt: Array.from(document.querySelectorAll('input[name="pelvisTilt"]:checked')).map(function(el) { return el.value; }),
                     pelvisTiltDegree: document.getElementById('pelvisTiltDegree').value,
-                    pelvisSide: document.querySelector('input[name="pelvisSide"]:checked')?.value || '',
+                    pelvisSide: Array.from(document.querySelectorAll('input[name="pelvisSide"]:checked')).map(function(el) { return el.value; }),
                     pelvisSideDegree: document.getElementById('pelvisSideDegree').value,
-                    pelvisUpDown: document.querySelector('input[name="pelvisUpDown"]:checked')?.value || '',
-                    pelvisRotation: document.querySelector('input[name="pelvisRotation"]:checked')?.value || '',
+                    pelvisUpDown: Array.from(document.querySelectorAll('input[name="pelvisUpDown"]:checked')).map(function(el) { return el.value; }),
+                    pelvisRotation: Array.from(document.querySelectorAll('input[name="pelvisRotation"]:checked')).map(function(el) { return el.value; }),
+                    pelvisRotationDegree: document.getElementById('pelvisRotationDegree').value,
                     functionalTilt: document.getElementById('functionalTilt').checked ? '是' : '否',
                     // 步驟6 膝蓋
-                    leftKnee: document.querySelector('input[name="leftKnee"]:checked')?.value || '',
+                    leftKnee: Array.from(document.querySelectorAll('input[name="leftKnee"]:checked')).map(function(el) { return el.value; }),
                     leftKneeDegree: document.getElementById('leftKneeDegree').value,
-                    rightKnee: document.querySelector('input[name="rightKnee"]:checked')?.value || '',
+                    rightKnee: Array.from(document.querySelectorAll('input[name="rightKnee"]:checked')).map(function(el) { return el.value; }),
                     rightKneeDegree: document.getElementById('rightKneeDegree').value,
                     // 步驟7 腳踝
-                    arch: document.querySelector('input[name="arch"]:checked')?.value || '',
-                    footRotation: document.querySelector('input[name="footRotation"]:checked')?.value || '',
+                    arch: Array.from(document.querySelectorAll('input[name="arch"]:checked')).map(function(el) { return el.value; }),
+                    footRotation: Array.from(document.querySelectorAll('input[name="footRotation"]:checked')).map(function(el) { return el.value; }),
                     // 步驟8 肩關節
                     shrug: document.querySelector('input[name="shrug"]:checked')?.value || '',
                     roundShoulder: document.querySelector('input[name="roundShoulder"]:checked')?.value || '',
-                    scapula: document.querySelector('input[name="scapula"]:checked')?.value || '',
-                    humerus: document.querySelector('input[name="humerus"]:checked')?.value || '',
+                    roundShoulderDegree: document.getElementById('roundShoulderDegree').value,
+                    scapula: Array.from(document.querySelectorAll('input[name="scapula"]:checked')).map(function(el) { return el.value; }),
+                    humerus: Array.from(document.querySelectorAll('input[name="humerus"]:checked')).map(function(el) { return el.value; }),
                     // 步驟9 髖膝踝
-                    hip: document.querySelector('input[name="hip"]:checked')?.value || '',
+                    hip: Array.from(document.querySelectorAll('input[name="hip"]:checked')).map(function(el) { return el.value; }),
                     kneeStability: document.querySelector('input[name="kneeStability"]:checked')?.value || '',
                     ankleStability: document.querySelector('input[name="ankleStability"]:checked')?.value || '',
                     // 步驟10 呼吸
@@ -2797,6 +3046,11 @@
                     weightTraining: document.getElementById('weightTraining').value,
                     pilatesTraining: document.getElementById('pilatesTraining').value,
                     stretchTraining: document.getElementById('stretchTraining').value,
+                    // 課程排序
+                    weightOrder: document.getElementById('weightOrder').value,
+                    pilatesOrder: document.getElementById('pilatesOrder').value,
+                    stretchOrder: document.getElementById('stretchOrder').value,
+                    courseOrderText: formatCourseOrder(),
                     clientUnderstand: document.querySelector('input[name="clientUnderstand"]:checked')?.value || '',
                     functionalTraining: document.getElementById('functionalTraining').value,
                     fasciaRelease: document.getElementById('fasciaRelease').value,
@@ -2813,6 +3067,23 @@
             
             
             return data;
+        }
+        
+        // 格式化課程排序文字
+        function formatCourseOrder() {
+            var courses = [
+                { name: '重訓', order: parseInt(document.getElementById('weightOrder').value) || 0 },
+                { name: '皮拉提斯', order: parseInt(document.getElementById('pilatesOrder').value) || 0 },
+                { name: '伸展', order: parseInt(document.getElementById('stretchOrder').value) || 0 }
+            ];
+            
+            // 過濾有排序的課程，按順序排列
+            var ordered = courses.filter(function(c) { return c.order > 0; })
+                                 .sort(function(a, b) { return a.order - b.order; });
+            
+            if (ordered.length === 0) return '';
+            
+            return ordered.map(function(c, i) { return (i + 1) + '.' + c.name; }).join(' → ');
         }
         
         function collectDiseaseData() {
@@ -2985,12 +3256,36 @@
                     result.push({ name: name, rating: rating });
                 }
             });
+            
+            if (result.length === 0) return '';
+            
             // 依星數由高到低排序
             result.sort(function(a, b) { return b.rating - a.rating; });
-            // 格式化輸出
-            return result.map(function(item) {
-                return item.name + '(' + item.rating + '星)';
-            }).join(', ');
+            
+            // 按星數分組，產生排序字串：王教練>李教練>張教練=陳教練
+            var output = [];
+            var currentRating = null;
+            var currentGroup = [];
+            
+            result.forEach(function(item) {
+                if (currentRating === null) {
+                    currentRating = item.rating;
+                    currentGroup.push(item.name);
+                } else if (item.rating === currentRating) {
+                    currentGroup.push(item.name);
+                } else {
+                    output.push(currentGroup.join('='));
+                    currentRating = item.rating;
+                    currentGroup = [item.name];
+                }
+            });
+            
+            // 加入最後一組
+            if (currentGroup.length > 0) {
+                output.push(currentGroup.join('='));
+            }
+            
+            return output.join('>');
         }
 
         async function submitAssessment() {
@@ -3075,6 +3370,152 @@
             closeSuccess();
             // 重置表單
             location.reload();
+        }
+
+        // ==================== 補件功能 ====================
+        var supplementData = {
+            historyIndex: null,
+            assessmentId: null,
+            memberName: '',
+            assessmentDate: '',
+            motiFiles: [],
+            inbodyFiles: []
+        };
+        
+        function openSupplementModal(index) {
+            var h = historyData[index];
+            if (!h) return;
+            
+            supplementData.historyIndex = index;
+            supplementData.assessmentId = h.id || null;
+            supplementData.memberName = memberData ? memberData.name : '';
+            supplementData.assessmentDate = h.date || '';
+            supplementData.motiFiles = [];
+            supplementData.inbodyFiles = [];
+            
+            // 顯示檢測資訊
+            document.getElementById('supplementInfo').innerHTML = 
+                '👤 <strong>' + supplementData.memberName + '</strong><br>' +
+                '📅 檢測日期: ' + supplementData.assessmentDate;
+            
+            // 清空預覽
+            document.getElementById('supplementMotiPreview').innerHTML = '';
+            document.getElementById('supplementInbodyPreview').innerHTML = '';
+            document.getElementById('supplementMotiInput').value = '';
+            document.getElementById('supplementInbodyInput').value = '';
+            document.getElementById('supplementSubmitBtn').disabled = true;
+            
+            // 顯示彈窗
+            document.getElementById('supplementOverlay').classList.add('active');
+        }
+        
+        function closeSupplementModal() {
+            document.getElementById('supplementOverlay').classList.remove('active');
+        }
+        
+        function handleSupplementFile(event, type) {
+            var files = Array.from(event.target.files);
+            var previewId = type === 'moti' ? 'supplementMotiPreview' : 'supplementInbodyPreview';
+            var preview = document.getElementById(previewId);
+            
+            if (type === 'moti') {
+                supplementData.motiFiles = supplementData.motiFiles.concat(files);
+            } else {
+                supplementData.inbodyFiles = files.slice(0, 1);
+            }
+            
+            // 更新預覽
+            updateSupplementPreview(type);
+            
+            // 更新按鈕狀態
+            updateSupplementButton();
+        }
+        
+        function updateSupplementPreview(type) {
+            var files = type === 'moti' ? supplementData.motiFiles : supplementData.inbodyFiles;
+            var previewId = type === 'moti' ? 'supplementMotiPreview' : 'supplementInbodyPreview';
+            var preview = document.getElementById(previewId);
+            
+            preview.innerHTML = files.map(function(file, index) {
+                var url = URL.createObjectURL(file);
+                return '<div class="supplement-preview-item">' +
+                    '<img src="' + url + '">' +
+                    '<button class="remove-btn" onclick="removeSupplementFile(\'' + type + '\', ' + index + ')">×</button>' +
+                    '</div>';
+            }).join('');
+        }
+        
+        function removeSupplementFile(type, index) {
+            if (type === 'moti') {
+                supplementData.motiFiles.splice(index, 1);
+            } else {
+                supplementData.inbodyFiles = [];
+            }
+            updateSupplementPreview(type);
+            updateSupplementButton();
+        }
+        
+        function updateSupplementButton() {
+            var hasFiles = supplementData.motiFiles.length > 0 || supplementData.inbodyFiles.length > 0;
+            document.getElementById('supplementSubmitBtn').disabled = !hasFiles;
+        }
+        
+        async function submitSupplement() {
+            if (!supplementData.assessmentId) {
+                showToast('無法取得檢測 ID，請聯繫管理員');
+                return;
+            }
+            
+            var btn = document.getElementById('supplementSubmitBtn');
+            btn.disabled = true;
+            btn.textContent = '上傳中...';
+            
+            try {
+                var memberId = memberData ? memberData.id : ('NEW_' + memberData.phone);
+                var folderName = memberId + '_' + supplementData.memberName;
+                var dateFolder = supplementData.assessmentDate.replace(/\//g, '-');
+                
+                var motiUrls = [];
+                var inbodyUrl = '';
+                
+                // 上傳 Moti 照片
+                for (var i = 0; i < supplementData.motiFiles.length; i++) {
+                    var url = await uploadToImageKit(supplementData.motiFiles[i], 'moti/' + folderName + '/' + dateFolder);
+                    if (url) motiUrls.push(url);
+                }
+                
+                // 上傳 Inbody 照片
+                if (supplementData.inbodyFiles.length > 0) {
+                    inbodyUrl = await uploadToImageKit(supplementData.inbodyFiles[0], 'inbody/' + folderName + '/' + dateFolder);
+                }
+                
+                // 呼叫 Make 更新紀錄
+                var response = await fetch(CONFIG.MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'supplement_images',
+                        assessmentId: supplementData.assessmentId,
+                        motiUrls: motiUrls,
+                        inbodyUrl: inbodyUrl
+                    })
+                });
+                
+                var result = await response.json();
+                
+                if (result.success) {
+                    showToast('補件上傳成功！');
+                    closeSupplementModal();
+                } else {
+                    showToast('補件失敗：' + (result.message || '未知錯誤'));
+                }
+            } catch (error) {
+                console.error('補件錯誤:', error);
+                showToast('補件上傳失敗，請稍後再試');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '上傳補件';
+            }
         }
 
         // ==================== 工具函數 ====================
