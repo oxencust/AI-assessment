@@ -749,6 +749,11 @@
             border-color: var(--pink);
             background: var(--pink-light);
         }
+        .supplement-upload-area.drag-over {
+            border-color: var(--green);
+            background: var(--green-light);
+            transform: scale(1.02);
+        }
         .supplement-upload-area input {
             display: none;
         }
@@ -2088,8 +2093,8 @@
             <!-- Moti 照片補件 -->
             <div class="supplement-upload-section">
                 <label class="supplement-upload-label">🤖 Moti AI 照片</label>
-                <div class="supplement-upload-area" onclick="document.getElementById('supplementMotiInput').click()">
-                    <div>📷 點擊選擇照片</div>
+                <div class="supplement-upload-area" id="supplementMotiArea" onclick="document.getElementById('supplementMotiInput').click()">
+                    <div>📷 點擊或拖曳照片到此處</div>
                     <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">支援多選</div>
                     <input type="file" id="supplementMotiInput" multiple accept="image/*" onchange="handleSupplementFile(event, 'moti')">
                 </div>
@@ -2099,8 +2104,8 @@
             <!-- Inbody 照片補件 -->
             <div class="supplement-upload-section">
                 <label class="supplement-upload-label">📊 InBody 照片</label>
-                <div class="supplement-upload-area" onclick="document.getElementById('supplementInbodyInput').click()">
-                    <div>📋 點擊選擇照片</div>
+                <div class="supplement-upload-area" id="supplementInbodyArea" onclick="document.getElementById('supplementInbodyInput').click()">
+                    <div>📋 點擊或拖曳照片到此處</div>
                     <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">1 張</div>
                     <input type="file" id="supplementInbodyInput" accept="image/*" onchange="handleSupplementFile(event, 'inbody')">
                 </div>
@@ -2291,9 +2296,35 @@
             // 載入待預約名冊
             loadBookingList();
             
+            // 讓 radio 可以再次點擊取消選擇
+            initRadioToggle();
+            
             // 先初始化 LIFF 登入，登入成功後才載入教練名單
             initLiff();
         });
+        
+        // ==================== Radio 取消選擇功能 ====================
+        function initRadioToggle() {
+            document.querySelectorAll('.radio-btn').forEach(function(label) {
+                var radio = label.querySelector('input[type="radio"]');
+                if (!radio) return;
+                
+                label.addEventListener('click', function(e) {
+                    // 如果已經選中，則取消選擇
+                    if (radio.dataset.wasChecked === 'true') {
+                        radio.checked = false;
+                        radio.dataset.wasChecked = 'false';
+                        e.preventDefault();
+                    } else {
+                        // 清除同組其他 radio 的狀態
+                        document.querySelectorAll('input[name="' + radio.name + '"]').forEach(function(r) {
+                            r.dataset.wasChecked = 'false';
+                        });
+                        radio.dataset.wasChecked = 'true';
+                    }
+                });
+            });
+        }
         
         // ==================== LIFF 初始化 ====================
         async function initLiff() {
@@ -3565,8 +3596,98 @@
             document.getElementById('supplementInbodyInput').value = '';
             document.getElementById('supplementSubmitBtn').disabled = true;
             
+            // 初始化拖曳功能
+            initSupplementDragDrop();
+            
             // 顯示彈窗
             document.getElementById('supplementOverlay').classList.add('active');
+        }
+        
+        // 補件拖曳功能
+        function initSupplementDragDrop() {
+            var motiArea = document.getElementById('supplementMotiArea');
+            var inbodyArea = document.getElementById('supplementInbodyArea');
+            
+            // Moti 拖曳
+            setupDragDrop(motiArea, 'moti', true);
+            // InBody 拖曳
+            setupDragDrop(inbodyArea, 'inbody', false);
+        }
+        
+        function setupDragDrop(area, type, multiple) {
+            // 防止重複綁定
+            if (area.dataset.dragInit) return;
+            area.dataset.dragInit = 'true';
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
+                area.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(function(eventName) {
+                area.addEventListener(eventName, function() {
+                    area.classList.add('drag-over');
+                }, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(function(eventName) {
+                area.addEventListener(eventName, function() {
+                    area.classList.remove('drag-over');
+                }, false);
+            });
+            
+            area.addEventListener('drop', function(e) {
+                var files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleDroppedFiles(files, type, multiple);
+                }
+            }, false);
+        }
+        
+        function handleDroppedFiles(files, type, multiple) {
+            var imageFiles = Array.from(files).filter(function(f) {
+                return f.type.startsWith('image/');
+            });
+            
+            if (imageFiles.length === 0) {
+                showToast('請拖曳圖片檔案');
+                return;
+            }
+            
+            // 如果不是多選，只取第一張
+            if (!multiple) {
+                imageFiles = [imageFiles[0]];
+            }
+            
+            var previewId = type === 'moti' ? 'supplementMotiPreview' : 'supplementInbodyPreview';
+            var preview = document.getElementById(previewId);
+            
+            imageFiles.forEach(function(file) {
+                // 加入資料
+                if (type === 'moti') {
+                    supplementData.motiFiles.push(file);
+                } else {
+                    supplementData.inbodyFiles = [file]; // InBody 只保留一張
+                    preview.innerHTML = ''; // 清空之前的預覽
+                }
+                
+                // 建立預覽
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var idx = type === 'moti' ? supplementData.motiFiles.length - 1 : 0;
+                    var div = document.createElement('div');
+                    div.className = 'supplement-preview-item';
+                    div.innerHTML = '<img src="' + e.target.result + '">' +
+                        '<button class="remove-btn" onclick="removeSupplementFile(\'' + type + '\', ' + idx + ')">×</button>';
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            updateSupplementBtn();
+            showToast('已加入 ' + imageFiles.length + ' 張照片');
         }
         
         function closeSupplementModal() {
@@ -3943,19 +4064,27 @@
             
             var html = '';
             bookings.forEach(function(booking) {
+                // 支援 snake_case 和 camelCase 兩種格式
+                var memberId = booking.member_id || booking.memberId || '';
+                var memberName = booking.member_name || booking.memberName || '';
+                var memberPhone = booking.member_phone || booking.memberPhone || '';
+                var bookingDate = booking.booking_date || booking.bookingDate || '';
+                var bookingTime = booking.booking_time || booking.bookingTime || '';
+                var id = booking.id || '';
+                
                 html += '<div class="booking-item-row" onclick="selectBooking(\'' + 
-                    (booking.member_id || '') + '\', \'' + 
-                    booking.member_name + '\', \'' + 
-                    booking.member_phone + '\', \'' + 
-                    booking.booking_date + '\', \'' + 
-                    booking.booking_time + '\', ' + 
-                    booking.id + ')">';
+                    memberId + '\', \'' + 
+                    memberName + '\', \'' + 
+                    memberPhone + '\', \'' + 
+                    bookingDate + '\', \'' + 
+                    bookingTime + '\', ' + 
+                    id + ')">';
                 html += '<div class="booking-item-info">';
-                html += '<div class="booking-item-name">' + booking.member_name + '</div>';
+                html += '<div class="booking-item-name">' + memberName + '</div>';
                 html += '<div class="booking-item-details">';
-                html += '<span>📅 ' + booking.booking_date + ' ' + booking.booking_time + '</span>';
-                if (booking.member_id) {
-                    html += '<span>🔖 ' + booking.member_id + '</span>';
+                html += '<span>📅 ' + bookingDate + ' ' + bookingTime + '</span>';
+                if (memberId) {
+                    html += '<span>🔖 ' + memberId + '</span>';
                 }
                 html += '</div></div>';
                 html += '<div class="booking-item-select">選擇 →</div>';
