@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>衡點健康 - MOTI 3D體態分析 回報表</title>
+    <title>衡點健身 - MOTI 3D體態分析 回報表</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
@@ -2994,34 +2994,51 @@
 
         // ==================== 圖片上傳到 ImageKit ====================
         async function uploadToImageKit(file, folder) {
-            // 從 Apps Script 取得簽名
-            var authResponse = await fetch(CONFIG.IMAGEKIT_AUTH_URL, {
-                method: 'GET'
-            });
-            var auth = await authResponse.json();
-            
-            // 上傳圖片到 ImageKit
-            var formData = new FormData();
-            formData.append('file', file);
-            formData.append('publicKey', CONFIG.IMAGEKIT_PUBLIC_KEY);
-            formData.append('signature', auth.signature);
-            formData.append('expire', auth.expire);
-            formData.append('token', auth.token);
-            formData.append('folder', folder);
-            formData.append('fileName', Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
-            
-            var uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
-                method: 'POST',
-                body: formData
-            });
-            
-            var result = await uploadResponse.json();
-            
-            if (result.error) {
-                throw new Error(result.error.message || '上傳失敗');
+            try {
+                // 從 Apps Script 取得簽名
+                var authResponse = await fetch(CONFIG.IMAGEKIT_AUTH_URL, {
+                    method: 'GET'
+                });
+                
+                if (!authResponse.ok) {
+                    throw new Error('認證服務錯誤: ' + authResponse.status);
+                }
+                
+                var auth = await authResponse.json();
+                console.log('ImageKit 認證:', auth);
+                
+                if (!auth.signature || !auth.expire || !auth.token) {
+                    throw new Error('認證資料不完整');
+                }
+                
+                // 上傳圖片到 ImageKit
+                var formData = new FormData();
+                formData.append('file', file);
+                formData.append('publicKey', CONFIG.IMAGEKIT_PUBLIC_KEY);
+                formData.append('signature', auth.signature);
+                formData.append('expire', auth.expire);
+                formData.append('token', auth.token);
+                formData.append('folder', folder);
+                formData.append('fileName', Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_'));
+                
+                var uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                var result = await uploadResponse.json();
+                console.log('ImageKit 上傳結果:', result);
+                
+                if (result.error) {
+                    console.error('ImageKit 錯誤:', result.error);
+                    throw new Error(result.error.message || '上傳失敗');
+                }
+                
+                return result.url;
+            } catch (error) {
+                console.error('uploadToImageKit 錯誤:', error);
+                throw error;
             }
-            
-            return result.url;
         }
 
         async function uploadAllImages(memberId, memberName, assessmentDate) {
