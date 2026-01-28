@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>衡點健身 - MOTI 3D體態分析 回報表</title>
+    <title>衡點健康 - MOTI 3D體態分析 回報表</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
@@ -1400,6 +1400,112 @@
             .radio-btn .circle { width: 10px; height: 10px; }
             .inline-form input[type="number"] { width: 55px; padding: 6px; }
         }
+        
+        /* 待預約名冊樣式 */
+        #bookingListCard {
+            background: linear-gradient(135deg, var(--yellow-light) 0%, var(--white) 100%);
+            border: 2px solid var(--yellow);
+        }
+        
+        .booking-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .booking-list-header:hover {
+            opacity: 0.8;
+        }
+        
+        .booking-count {
+            background: var(--pink);
+            color: var(--white);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+        
+        .toggle-arrow {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-left: auto;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-arrow.open {
+            transform: rotate(180deg);
+        }
+        
+        .booking-list-content {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--yellow);
+        }
+        
+        .booking-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .booking-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--white);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .booking-item-row:hover {
+            border-color: var(--green);
+            background: var(--green-light);
+            transform: translateX(4px);
+        }
+        
+        .booking-item-info {
+            flex: 1;
+        }
+        
+        .booking-item-name {
+            font-weight: 600;
+            color: var(--green-dark);
+            font-size: 1rem;
+        }
+        
+        .booking-item-details {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 4px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .booking-item-select {
+            color: var(--green);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .booking-empty {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+        }
+        
+        .loading-small {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+        }
     </style>
 </head>
 <body>
@@ -1424,6 +1530,22 @@
 
         <!-- Page 1 -->
         <div class="main-content active" id="page1">
+            <!-- 待預約名冊 -->
+            <div class="card" id="bookingListCard">
+                <div class="booking-list-header" onclick="toggleBookingList()">
+                    <h2 class="card-title" style="margin-bottom: 0; cursor: pointer;">
+                        📋 待預約名冊 
+                        <span class="booking-count" id="bookingCount">0</span>
+                        <span class="toggle-arrow" id="toggleArrow">▼</span>
+                    </h2>
+                </div>
+                <div class="booking-list-content" id="bookingListContent" style="display: none;">
+                    <div class="booking-items" id="bookingItems">
+                        <div class="loading-small">載入中...</div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="card">
                 <h2 class="card-title">📋 會員資料</h2>
                 <div class="search-row">
@@ -2165,6 +2287,9 @@
             initDragDrop();
             updateSkeletonStep();
             updateMuscleStep();
+            
+            // 載入待預約名冊
+            loadBookingList();
             
             // 先初始化 LIFF 登入，登入成功後才載入教練名單
             initLiff();
@@ -3348,6 +3473,10 @@
                 document.getElementById('submitBtn').disabled = false;
                 
                 if (result.success) {
+                    // 如果是從待預約名冊選擇的，標記為已完成
+                    if (window.selectedBookingId) {
+                        markBookingCompleted(window.selectedBookingId);
+                    }
                     showSuccess(formData, imageData, result);
                 } else {
                     showToast('提交失敗：' + (result.error || '未知錯誤'));
@@ -3357,6 +3486,24 @@
                 document.getElementById('submitBtn').disabled = false;
                 showToast('提交失敗，請稍後再試');
                 console.error('Submit error:', error);
+            }
+        }
+        
+        // 標記預約為已完成
+        async function markBookingCompleted(bookingId) {
+            try {
+                await fetch(CONFIG.MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'booking',
+                        type: 'complete',
+                        id: bookingId
+                    })
+                });
+                console.log('預約已標記為完成:', bookingId);
+            } catch (error) {
+                console.error('標記預約完成失敗:', error);
             }
         }
         
@@ -3740,6 +3887,103 @@
                 else fill.style.width = '0%';
             });
             rating.querySelector('.rating-value').textContent = value;
+        }
+        
+        // ==================== 待預約名冊 ====================
+        var bookingListOpen = false;
+        
+        function toggleBookingList() {
+            bookingListOpen = !bookingListOpen;
+            var content = document.getElementById('bookingListContent');
+            var arrow = document.getElementById('toggleArrow');
+            
+            if (bookingListOpen) {
+                content.style.display = 'block';
+                arrow.classList.add('open');
+            } else {
+                content.style.display = 'none';
+                arrow.classList.remove('open');
+            }
+        }
+        
+        async function loadBookingList() {
+            try {
+                var response = await fetch(CONFIG.MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'booking',
+                        type: 'list'
+                    })
+                });
+                
+                var result = await response.json();
+                
+                if (result.success && result.bookings) {
+                    renderBookingList(result.bookings);
+                } else {
+                    renderBookingList([]);
+                }
+            } catch (error) {
+                console.error('載入待預約名冊失敗:', error);
+                renderBookingList([]);
+            }
+        }
+        
+        function renderBookingList(bookings) {
+            var container = document.getElementById('bookingItems');
+            var countEl = document.getElementById('bookingCount');
+            
+            countEl.textContent = bookings.length;
+            
+            if (bookings.length === 0) {
+                container.innerHTML = '<div class="booking-empty">📭 目前沒有待檢測的預約</div>';
+                return;
+            }
+            
+            var html = '';
+            bookings.forEach(function(booking) {
+                html += '<div class="booking-item-row" onclick="selectBooking(\'' + 
+                    (booking.member_id || '') + '\', \'' + 
+                    booking.member_name + '\', \'' + 
+                    booking.member_phone + '\', \'' + 
+                    booking.booking_date + '\', \'' + 
+                    booking.booking_time + '\', ' + 
+                    booking.id + ')">';
+                html += '<div class="booking-item-info">';
+                html += '<div class="booking-item-name">' + booking.member_name + '</div>';
+                html += '<div class="booking-item-details">';
+                html += '<span>📅 ' + booking.booking_date + ' ' + booking.booking_time + '</span>';
+                if (booking.member_id) {
+                    html += '<span>🔖 ' + booking.member_id + '</span>';
+                }
+                html += '</div></div>';
+                html += '<div class="booking-item-select">選擇 →</div>';
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function selectBooking(memberId, name, phone, date, time, bookingId) {
+            // 填入會員資料
+            document.getElementById('memberName').value = name;
+            document.getElementById('memberPhone').value = phone;
+            document.getElementById('assessmentDate').value = date;
+            document.getElementById('assessmentTime').value = time;
+            
+            // 儲存 bookingId 用於後續標記已完成
+            window.selectedBookingId = bookingId;
+            
+            // 收合名冊
+            bookingListOpen = false;
+            document.getElementById('bookingListContent').style.display = 'none';
+            document.getElementById('toggleArrow').classList.remove('open');
+            
+            // 自動查詢會員
+            searchMember();
+            
+            showToast('已選擇：' + name);
         }
     </script>
 </body>
