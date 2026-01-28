@@ -2730,11 +2730,56 @@
                 '<span class="detail-value">' + (h.total_courses || 0) + ' 堂</span>' +
                 '</div>';
             
+            // 課程明細
+            var weightCourses = parseInt(h.weight_training_courses) || 0;
+            var pilatesCourses = parseInt(h.pilates_courses) || 0;
+            var stretchCourses = parseInt(h.stretch_courses) || 0;
+            
+            if (weightCourses > 0 || pilatesCourses > 0 || stretchCourses > 0) {
+                html += '<div class="detail-row">' +
+                    '<span class="detail-label">📋 課程明細</span>' +
+                    '<div class="course-detail-tags">';
+                if (weightCourses > 0) {
+                    html += '<span class="course-tag weight">重訓 ' + weightCourses + ' 堂</span>';
+                }
+                if (pilatesCourses > 0) {
+                    html += '<span class="course-tag pilates">皮拉提斯 ' + pilatesCourses + ' 堂</span>';
+                }
+                if (stretchCourses > 0) {
+                    html += '<span class="course-tag stretch">伸展 ' + stretchCourses + ' 堂</span>';
+                }
+                html += '</div></div>';
+            }
+            
             // 短期目標
             if (h.short_term_goal) {
                 html += '<div class="detail-row">' +
                     '<span class="detail-label">🎯 短期目標</span>' +
                     '<span class="detail-value">' + h.short_term_goal + '</span>' +
+                    '</div>';
+            }
+            
+            // 期望目標
+            if (h.goals) {
+                html += '<div class="detail-row">' +
+                    '<span class="detail-label">🎯 期望目標</span>' +
+                    '<span class="detail-value">' + h.goals + '</span>' +
+                    '</div>';
+            }
+            
+            // 疾病史
+            if (h.diseases) {
+                html += '<div class="detail-row">' +
+                    '<span class="detail-label">🏥 疾病史</span>' +
+                    '<span class="detail-value">' + h.diseases + '</span>' +
+                    '</div>';
+            }
+            
+            // 備註
+            if (h.notes) {
+                html += '<div class="detail-row">' +
+                    '<span class="detail-label">📝 備註</span>' +
+                    '<span class="detail-value">' + h.notes + '</span>' +
                     '</div>';
             }
             
@@ -3770,8 +3815,12 @@
             
             try {
                 var memberId = memberData ? memberData.id : ('NEW_' + supplementData.memberName);
-                var folderName = memberId + '_' + supplementData.memberName;
-                var dateFolder = supplementData.assessmentDate.replace(/\//g, '-');
+                // 清理 folderName，移除特殊字元
+                var folderName = (memberId + '_' + supplementData.memberName).replace(/[^a-zA-Z0-9_\u4e00-\u9fa5]/g, '_');
+                // 只取日期部分，移除時間，並清理特殊字元
+                var dateFolder = supplementData.assessmentDate.split(' ')[0].replace(/[^0-9\-]/g, '-');
+                
+                console.log('補件 folder:', 'moti/' + folderName + '/' + dateFolder);
                 
                 var motiUrls = [];
                 var inbodyUrl = '';
