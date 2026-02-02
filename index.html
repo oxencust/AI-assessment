@@ -2207,8 +2207,19 @@
         // 安全解析 JSON（處理控制字元）
         async function safeParseJSON(response) {
             var text = await response.text();
-            // 移除不合法的控制字元（保留換行 \n 和 Tab \t）
+            
+            // 移除不合法的控制字元
             text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+            
+            // 處理 JSON 字串值中的實際換行符號（將其轉換為 \n）
+            // 這段會找到雙引號內的換行並替換
+            text = text.replace(/"([^"\\]|\\.)*"/g, function(match) {
+                return match
+                    .replace(/\r\n/g, '\\n')  // Windows 換行
+                    .replace(/\n/g, '\\n')    // Unix 換行
+                    .replace(/\r/g, '\\n');   // Mac 舊版換行
+            });
+            
             return JSON.parse(text);
         }
 
