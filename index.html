@@ -4395,6 +4395,10 @@
                     body: JSON.stringify({
                         action: 'supplement_images',
                         assessmentId: supplementData.assessmentId,
+                        memberId: memberData ? (memberData.id || memberData.member_id || '') : '',
+                        memberName: supplementData.memberName,
+                        memberPhone: memberData ? memberData.phone : '',
+                        assessmentDate: supplementData.assessmentDate,
                         motiUrls: motiUrls.join(','),
                         inbodyUrl: inbodyUrl
                     })
@@ -4743,4 +4747,5 @@
     </script>
 </body>
 </html>
+
 
